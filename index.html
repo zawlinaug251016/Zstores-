@@ -5,17 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Zstores - Hospital Order Dispatch</title>
 
-<!-- React & ReactDOM CDN -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
-<!-- Babel CDN for inline JSX -->
 <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 
-<!-- PDF.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -38,43 +34,57 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 }
 
 const DEFAULT_RULES = {
-"Zaw Rehab Run": [
+"ZAW REHAB RUN": [
 "Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes",
 "Cheese - Cheddar PC", "Rice Pudding", "Custard PC",
-"Vanilla Yogurt PC", "Strawberry Yogurt PC", "Apple Juice PC",
-"Orange Juice PC", "Fresh Apple", "Ice Coffee", "Chocolate Chill", "Carrot Cake"
+"Vanilla Yogurt PC", "Vanilla Yoghurt PC", "Strawberry Yogurt PC", "Strawberry Yoghurt PC",
+"Apple Juice PC", "Orange Juice PC", "Fresh Apple", "Apple Fresh", "Ice Coffee", "Iced Coffee",
+"Chocolate Chill", "Ham & Salad Sandwich", "Egg Mayo Sandwich"
 ],
-"Steve.M Rehab Run": [],
-"Juice Run": [
+"STEVE.M REHAB RUN": [],
+"JUICE RUN": [
 "Apple Juice", "Orange Juice", "Diced Peaches", "Diced Pears"
 ],
-"Chiller Run": [
+"CHILLER RUN": [
 "Full Cream Milk", "Hilo Milk", "Hilo PC Milk",
 "Vanilla Yoghurt", "Strawberry Yoghurt", "Strawberry Yogurt",
-"Rice Pudding", "Custard", "Cheese - Cheddar", "Cheddar PC"
+"Rice Pudding", "Custard", "Cheese - Cheddar", "Cheddar PC",
+"Sandwich", "Ham & Salad", "Egg Mayo"
 ],
-"Dry Run": [
+"DRY RUN": [
 "White Sugar", "Coffee PC", "Decaf Coffee", "Sweetener",
 "Water Crackers", "Scotch Nice", "Soy Milk", "Rice Milk",
 "Lactose Free Milk", "Tea Bags Black", "Green Tea", "Tea Bags - Bushells",
 "Fruit Cake PC", "Milo"
 ],
-"Freezer Run": [
-"Wholemeal Bread", "White Bread", "Multigrain Bread",
+"FREEZER RUN": [
 "Ice Cream", "Butter PC", "Margarine PC"
 ],
-"Afternoon Run": [
-"Bananas fresh"
+"AFTERNOON RUN": [
+"Bananas fresh", "Fresh Bananas", "Apple Fresh", "Fresh Apple", "Carrot Cake"
 ],
-"Pantry Run": [
+"PANTRY RUN": [
 "Thick", "Thickened", "Level 100", "Level 400", "Level 900"
 ],
-"Medi Hotel - Chiller": [],
-"Medi Hotel - Dry": []
+"MEDI HOTEL - CHILLER": [],
+"MEDI HOTEL - DRY": []
 };
 
 const REHAB_WARDS = ["fshrehab2", "fshrehab1", "fshrehabground", "fshmentalhealtha", "rehab2", "rehab1", "rehabground", "mentalhealtha", "mentalhealth"];
 const MEDI_HOTEL_WARDS = ["emergency", "m8", "m7", "m6", "m5"];
+
+const REHAB_FREEZER_KEYWORDS = [
+"butter pc", "margarine pc", "ice cream", "carrot cake",
+"white bread", "wholemeal bread", "multigrain bread", "le moulin"
+];
+
+const AFTERNOON_KEYWORDS = [
+"apple fresh", "fresh apple", "bananas fresh", "fresh bananas", "banana", "carrot cake"
+];
+
+const BREAD_KEYWORDS = [
+"white bread", "wholemeal bread", "multigrain bread", "le moulin", "bread"
+];
 
 const JUICE_WARD_ORDER = [
 "Mental Health", "Mental Health A", "Rehab 2", "Rehab Ground", "Rehab 1",
@@ -128,7 +138,7 @@ return dateStr;
 function App() {
 const [rules, setRules] = useState(() => {
 try {
-const saved = localStorage.getItem('zstores_rules_v8');
+const saved = localStorage.getItem('zstores_rules_v15');
 return saved ? JSON.parse(saved) : DEFAULT_RULES;
 } catch(e) {
 return DEFAULT_RULES;
@@ -137,22 +147,22 @@ return DEFAULT_RULES;
 
 const [parsedData, setParsedData] = useState([]);
 const [deliveryDate, setDeliveryDate] = useState("");
-const [selectedRun, setSelectedRun] = useState("Zaw Rehab Run");
+const [selectedRun, setSelectedRun] = useState("AFTERNOON RUN");
 const [checkedItems, setCheckedItems] = useState({});
 const [activeTab, setActiveTab] = useState("picker");
 const [newCategoryItem, setNewCategoryItem] = useState("");
-const [targetCategory, setTargetCategory] = useState("Zaw Rehab Run");
+const [targetCategory, setTargetCategory] = useState("AFTERNOON RUN");
 const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 try {
-localStorage.setItem('zstores_rules_v8', JSON.stringify(rules));
+localStorage.setItem('zstores_rules_v15', JSON.stringify(rules));
 } catch(e) {}
 }, [rules]);
 
 const isChilledItem = (itemName) => {
 const lower = itemName.toLowerCase();
-const chillerKeywords = [...(rules["Chiller Run"] || []), "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese"];
+const chillerKeywords = [...(rules["CHILLER RUN"] || []), "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese", "sandwich"];
 return chillerKeywords.some(kw => lower.includes(kw.toLowerCase()));
 };
 
@@ -160,29 +170,58 @@ const getCategory = (itemName, wardName) => {
 const lowerItem = itemName.toLowerCase();
 const cleanWard = wardName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
+// 1. Medi Hotel Wards
 if (MEDI_HOTEL_WARDS.some(mw => cleanWard.includes(mw))) {
-return isChilledItem(itemName) ? "Medi Hotel - Chiller" : "Medi Hotel - Dry";
+return isChilledItem(itemName) ? "MEDI HOTEL - CHILLER" : "MEDI HOTEL - DRY";
 }
 
-if (lowerItem.includes("thick") || lowerItem.includes("level")) {
-return "Pantry Run";
-}
-
+// 2. Rehab & Mental Health Wards
 const isRehabWard = REHAB_WARDS.some(rw => cleanWard.includes(rw));
 if (isRehabWard) {
-const zawKeywords = rules["Zaw Rehab Run"] || DEFAULT_RULES["Zaw Rehab Run"];
-const isZawItem = zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase()));
-return isZawItem ? "Zaw Rehab Run" : "Steve.M Rehab Run";
+const isFreezerItem = REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw));
+if (isFreezerItem) {
+return "FREEZER RUN";
 }
 
+const zawKeywords = rules["ZAW REHAB RUN"] || DEFAULT_RULES["ZAW REHAB RUN"];
+const isZawItem = zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase()));
+return isZawItem ? "ZAW REHAB RUN" : "STEVE.M REHAB RUN";
+}
+
+// 3. General Wards - Explicit Route Rules & Exclusions
+
+// STRICT BLOCK: Bread ordered by general wards is completely dropped (returns null)
+const isBreadItem = BREAD_KEYWORDS.some(kw => lowerItem.includes(kw));
+if (isBreadItem) {
+return null;
+}
+
+// RULE: Sandwiches MUST go to CHILLER RUN (never PANTRY RUN)
+if (lowerItem.includes("sandwich") || lowerItem.includes("ham & salad") || lowerItem.includes("egg mayo")) {
+return "CHILLER RUN";
+}
+
+// RULE: Fresh Fruit & Carrot Cake MUST go to AFTERNOON RUN (never PANTRY RUN)
+const isAfternoonItem = AFTERNOON_KEYWORDS.some(kw => lowerItem.includes(kw));
+if (isAfternoonItem) {
+return "AFTERNOON RUN";
+}
+
+// RULE: Thickened items to PANTRY RUN
+if (lowerItem.includes("thick") || lowerItem.includes("level")) {
+return "PANTRY RUN";
+}
+
+// 4. Custom User Rules Matching
 for (const [category, keywords] of Object.entries(rules)) {
-if (["Zaw Rehab Run", "Steve.M Rehab Run", "Medi Hotel - Chiller", "Medi Hotel - Dry"].includes(category)) continue;
+if (["ZAW REHAB RUN", "STEVE.M REHAB RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
 if (keywords.some(kw => lowerItem.includes(kw.toLowerCase()))) {
 return category;
 }
 }
 
-return "Pantry Run";
+// Default Fallback
+return "PANTRY RUN";
 };
 
 const handleFileUpload = async (event) => {
@@ -249,14 +288,19 @@ const possibleUnit = lines[i + 2];
 const possibleName = lines[i + 3];
 
 if (possibleQty.match(/^\d+$/) && (possibleUnit === "Each" || possibleUnit === "Litre" || possibleUnit === "Kilogram")) {
+const assignedCategory = getCategory(possibleName, currentWard);
+
+// Only add item if it wasn't blocked (category is not null)
+if (assignedCategory !== null) {
 orders.push({
 id: `${currentWard}-${possibleName}-${Math.random()}`,
 ward: currentWard,
 qty: parseInt(possibleQty, 10),
 unit: possibleUnit,
 name: possibleName,
-category: getCategory(possibleName, currentWard)
+category: assignedCategory
 });
+}
 i += 3;
 }
 }
@@ -310,15 +354,15 @@ if (!grouped[item.ward]) grouped[item.ward] = [];
 grouped[item.ward].push(item);
 });
 
-if (selectedRun === "Chiller Run") {
+if (selectedRun === "CHILLER RUN") {
 return sortWardsByOrder(grouped, CHILLER_WARD_ORDER);
-} else if (selectedRun === "Juice Run") {
+} else if (selectedRun === "JUICE RUN") {
 return sortWardsByOrder(grouped, JUICE_WARD_ORDER);
-} else if (selectedRun === "Zaw Rehab Run") {
+} else if (selectedRun === "ZAW REHAB RUN") {
 return sortWardsByOrder(grouped, ZAW_REHAB_WARD_ORDER);
-} else if (selectedRun === "Steve.M Rehab Run") {
+} else if (selectedRun === "STEVE.M REHAB RUN") {
 return sortWardsByOrder(grouped, STEVE_REHAB_WARD_ORDER);
-} else if (["Dry Run", "Freezer Run", "Afternoon Run", "Pantry Run"].includes(selectedRun)) {
+} else if (["DRY RUN", "FREEZER RUN", "AFTERNOON RUN", "PANTRY RUN"].includes(selectedRun)) {
 return sortWardsByOrder(grouped, STANDARD_RUN_WARD_ORDER);
 }
 
@@ -344,9 +388,9 @@ setRules(prev => ({
 };
 
 const availableCategories = [
-"Zaw Rehab Run", "Steve.M Rehab Run", "Juice Run",
-"Chiller Run", "Dry Run", "Freezer Run", "Afternoon Run",
-"Pantry Run", "Medi Hotel - Chiller", "Medi Hotel - Dry"
+"ZAW REHAB RUN", "STEVE.M REHAB RUN", "JUICE RUN",
+"CHILLER RUN", "DRY RUN", "FREEZER RUN", "AFTERNOON RUN",
+"PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
 ];
 
 return (
@@ -362,13 +406,13 @@ return (
 onClick={() => setActiveTab("picker")}
 className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${activeTab === 'picker' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
 >
-Run Picker
+RUN PICKER
 </button>
 <button
 onClick={() => setActiveTab("settings")}
 className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${activeTab === 'settings' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
 >
-Item Rules Settings
+ITEM RULES SETTINGS
 </button>
 </div>
 </header>
@@ -391,7 +435,7 @@ className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 fil
 onClick={() => window.print()}
 className="w-full md:w-auto px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2 shadow"
 >
-<span>Print Active Run List</span>
+<span>PRINT ACTIVE RUN LIST</span>
 </button>
 )}
 </div>
@@ -417,7 +461,7 @@ isSelected
 : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
 }`}
 >
-<div className="text-xs font-medium opacity-80">{category}</div>
+<div className="text-xs font-bold tracking-wider opacity-90">{category}</div>
 <div className="text-xl font-bold mt-1">{count} <span className="text-xs font-normal">items</span></div>
 </button>
 );
@@ -429,7 +473,7 @@ isSelected
 <div>
 <div className="mb-4 flex justify-between items-end border-b pb-3">
 <div>
-<h2 className="text-xl font-bold text-slate-800">{selectedRun} Delivery List</h2>
+<h2 className="text-xl font-bold text-slate-800">{selectedRun} DELIVERY LIST</h2>
 <p className="text-xs text-slate-500">Sorted in fixed route print sequence</p>
 </div>
 <div className="flex items-center gap-2">
@@ -448,7 +492,7 @@ Date: {deliveryDate}
 {Object.keys(itemSummary).length > 0 && (
 <div className="card bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6">
 <h3 className="text-sm font-bold text-emerald-900 uppercase tracking-wider mb-2 border-b border-emerald-200 pb-1">
-📦 Catering Store Pick List Summary
+📦 CATERING STORE PICK LIST SUMMARY
 </h3>
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
 {Object.entries(itemSummary).map(([itemLabel, totalQty]) => (
@@ -522,7 +566,7 @@ Upload your daily hospital floor stock delivery note PDF to separate items into 
 </div>
 ) : (
 <div className="bg-white rounded-xl shadow-sm p-6">
-<h2 className="text-xl font-bold text-slate-800 mb-2">Category Rule Settings</h2>
+<h2 className="text-xl font-bold text-slate-800 mb-2">CATEGORY RULE SETTINGS</h2>
 <p className="text-xs text-slate-500 mb-6">Manage keywords used to automatically route incoming PDF items into the category runs.</p>
 
 <form onSubmit={handleAddItemRule} className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8 flex flex-col md:flex-row gap-3 items-end">
@@ -537,7 +581,7 @@ className="w-full p-2.5 border rounded-lg text-sm focus:outline-emerald-500"
 />
 </div>
 
-<div className="w-full md:w-48">
+<div className="w-full md:w-56">
 <label className="block text-xs font-semibold text-slate-600 mb-1">Assign to Category Run</label>
 <select
 value={targetCategory}
