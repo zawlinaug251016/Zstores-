@@ -82,7 +82,7 @@ const DEFAULT_RULES = {
 "Chocolate Chill", "Ham & Salad Sandwich", "Egg Mayo Sandwich"
 ],
 "STEVE.M REHAB RUN": [],
-"JUICE RUN": [
+"JUICE RUN - BEN.Y": [
 "Apple Juice", "Orange Juice", "Diced Peaches", "Diced Pears"
 ],
 "CHILLER RUN": [
@@ -91,7 +91,7 @@ const DEFAULT_RULES = {
 "Rice Pudding", "Custard", "Cheese - Cheddar", "Cheddar PC",
 "Sandwich", "Ham & Salad", "Egg Mayo"
 ],
-"DRY RUN": [
+"DRY RUN - JAMES.Y": [
 "White Sugar", "Coffee PC", "Decaf Coffee", "Sweetener",
 "Water Crackers", "Scotch Nice", "Soy Milk", "Rice Milk",
 "Lactose Free Milk", "Tea Bags Black", "Green Tea", "Tea Bags - Bushells",
@@ -167,7 +167,7 @@ day = parts[3].padStart(2, '0');
 } else {
 day = parts[1].padStart(2, '0');
 month = parts[2].padStart(2, '0');
-year = parts[3].slice(-2);
+year = parts[1].slice(-2);
 }
 return `${day}/${month}/${year}`;
 }
@@ -177,7 +177,7 @@ return dateStr;
 function App() {
 const [rules, setRules] = useState(() => {
 try {
-const saved = localStorage.getItem('zstores_rules_v19');
+const saved = localStorage.getItem('zstores_rules_v20');
 return saved ? JSON.parse(saved) : DEFAULT_RULES;
 } catch(e) {
 return DEFAULT_RULES;
@@ -188,6 +188,7 @@ const [parsedData, setParsedData] = useState([]);
 const [deliveryDate, setDeliveryDate] = useState("");
 const [selectedRun, setSelectedRun] = useState("ED - DAVE");
 const [checkedItems, setCheckedItems] = useState({});
+const [highlightedItemKey, setHighlightedItemKey] = useState(null);
 const [activeTab, setActiveTab] = useState("picker");
 const [newCategoryItem, setNewCategoryItem] = useState("");
 const [targetCategory, setTargetCategory] = useState("ED - DAVE");
@@ -195,19 +196,22 @@ const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 try {
-localStorage.setItem('zstores_rules_v19', JSON.stringify(rules));
+localStorage.setItem('zstores_rules_v20', JSON.stringify(rules));
 } catch(e) {}
 }, [rules]);
+
+// Reset highlighted item when switching runs
+useEffect(() => {
+setHighlightedItemKey(null);
+}, [selectedRun]);
 
 const getItemType = (itemName) => {
 const lower = itemName.toLowerCase();
 
-// Explicit Freezer items
 if (lower.includes("ice cream") || lower.includes("ice-cream") || lower.includes("bulla")) {
 return "FREEZER";
 }
 
-// Explicit Dry items (Soy, Lactose Free, Rice Milk, Tea, Sugar, Biscuits)
 if (
 lower.includes("soy milk") ||
 lower.includes("lactose free") ||
@@ -224,7 +228,6 @@ lower.includes("biscuit")
 return "DRY";
 }
 
-// Chiller items
 const chillerKeywords = [...(rules["CHILLER RUN"] || []), "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese", "sandwich", "ice coffee", "iced coffee", "chill"];
 if (chillerKeywords.some(kw => lower.includes(kw.toLowerCase()))) {
 return "CHILLER";
@@ -237,18 +240,15 @@ const getCategory = (itemName, wardName) => {
 const lowerItem = itemName.toLowerCase();
 const cleanWard = wardName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-// 1. Standalone ED - DAVE Run (FSH Emergency)
 if (cleanWard.includes("emergency") || cleanWard.includes("ed")) {
 return "ED - DAVE";
 }
 
-// 2. Medi Hotel Wards
 if (MEDI_HOTEL_WARDS.some(mw => cleanWard.includes(mw))) {
 const itemType = getItemType(itemName);
 return itemType === "CHILLER" ? "MEDI HOTEL - CHILLER" : "MEDI HOTEL - DRY";
 }
 
-// 3. Rehab & Mental Health Wards
 const isRehabWard = REHAB_WARDS.some(rw => cleanWard.includes(rw));
 if (isRehabWard) {
 const isFreezerItem = REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw));
@@ -261,31 +261,24 @@ const isZawItem = zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase()));
 return isZawItem ? "ZAW REHAB RUN" : "STEVE.M REHAB RUN";
 }
 
-// 4. General Wards - Exclusions & Route Rules
-
-// Drop general ward bread
 const isBreadItem = BREAD_KEYWORDS.some(kw => lowerItem.includes(kw));
 if (isBreadItem) {
 return null;
 }
 
-// Sandwiches to CHILLER RUN
 if (lowerItem.includes("sandwich") || lowerItem.includes("ham & salad") || lowerItem.includes("egg mayo")) {
 return "CHILLER RUN";
 }
 
-// Fresh Fruit & Carrot Cake to AFTERNOON RUN
 const isAfternoonItem = AFTERNOON_KEYWORDS.some(kw => lowerItem.includes(kw));
 if (isAfternoonItem) {
 return "AFTERNOON RUN";
 }
 
-// Thickened items to PANTRY RUN
 if (lowerItem.includes("thick") || lowerItem.includes("level")) {
 return "PANTRY RUN";
 }
 
-// 5. Custom User Rules Matching
 for (const [category, keywords] of Object.entries(rules)) {
 if (["ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
 if (keywords.some(kw => lowerItem.includes(kw.toLowerCase()))) {
@@ -293,7 +286,6 @@ return category;
 }
 }
 
-// Default Fallback
 return "PANTRY RUN";
 };
 
@@ -318,6 +310,7 @@ const { orders, extractedDate } = parseDeliveryNoteLines(fullTextLines);
 setParsedData(orders);
 setDeliveryDate(extractedDate);
 setCheckedItems({});
+setHighlightedItemKey(null);
 } catch (err) {
 alert("Error parsing PDF file: " + err.message);
 } finally {
@@ -385,6 +378,10 @@ const toggleCheck = (id) => {
 setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
 };
 
+const toggleSummaryHighlight = (itemKey) => {
+setHighlightedItemKey(prev => (prev === itemKey ? null : itemKey));
+};
+
 const currentRunItems = useMemo(() => {
 return parsedData.filter(item => item.category === selectedRun);
 }, [parsedData, selectedRun]);
@@ -426,7 +423,6 @@ if (!grouped[item.ward]) grouped[item.ward] = [];
 grouped[item.ward].push(item);
 });
 
-// For ED - DAVE, sort internal items: FREEZER (0) -> CHILLER (1) -> DRY (2)
 if (selectedRun === "ED - DAVE") {
 const typePriority = { "FREEZER": 0, "CHILLER": 1, "DRY": 2 };
 Object.keys(grouped).forEach(wardKey => {
@@ -440,13 +436,13 @@ return typePriority[typeA] - typePriority[typeB];
 
 if (selectedRun === "CHILLER RUN") {
 return sortWardsByOrder(grouped, CHILLER_WARD_ORDER);
-} else if (selectedRun === "JUICE RUN") {
+} else if (selectedRun === "JUICE RUN - BEN.Y") {
 return sortWardsByOrder(grouped, JUICE_WARD_ORDER);
 } else if (selectedRun === "ZAW REHAB RUN") {
 return sortWardsByOrder(grouped, ZAW_REHAB_WARD_ORDER);
 } else if (selectedRun === "STEVE.M REHAB RUN") {
 return sortWardsByOrder(grouped, STEVE_REHAB_WARD_ORDER);
-} else if (["DRY RUN", "FREEZER RUN", "AFTERNOON RUN", "PANTRY RUN"].includes(selectedRun)) {
+} else if (["DRY RUN - JAMES.Y", "FREEZER RUN", "AFTERNOON RUN", "PANTRY RUN"].includes(selectedRun)) {
 return sortWardsByOrder(grouped, STANDARD_RUN_WARD_ORDER);
 }
 
@@ -472,8 +468,8 @@ setRules(prev => ({
 };
 
 const availableCategories = [
-"ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "JUICE RUN",
-"CHILLER RUN", "DRY RUN", "FREEZER RUN", "AFTERNOON RUN",
+"ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "JUICE RUN - BEN.Y",
+"CHILLER RUN", "DRY RUN - JAMES.Y", "FREEZER RUN", "AFTERNOON RUN",
 "PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
 ];
 
@@ -584,16 +580,34 @@ Date: {deliveryDate}
 {/* CATERING STORE PICKING SUMMARY */}
 {Object.keys(itemSummary).length > 0 && (
 <div className="card bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6">
-<h3 className="text-sm font-bold text-emerald-900 uppercase tracking-wider mb-2 border-b border-emerald-200 pb-1">
+<div className="flex justify-between items-center mb-2 border-b border-emerald-200 pb-1">
+<h3 className="text-sm font-bold text-emerald-900 uppercase tracking-wider">
 📦 CATERING STORE PICK LIST SUMMARY
 </h3>
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-{Object.entries(itemSummary).map(([itemLabel, totalQty]) => (
-<div key={itemLabel} className="flex justify-between items-center bg-white px-3 py-1.5 rounded border border-emerald-100 text-xs font-semibold text-slate-800">
-<span>{itemLabel}</span>
-<span className="bg-emerald-600 text-white px-2 py-0.5 rounded font-bold">{totalQty}</span>
+<span className="text-[11px] text-emerald-700 font-medium">
+Click an item below to highlight matching lines in yellow
+</span>
 </div>
-))}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+{Object.entries(itemSummary).map(([itemLabel, totalQty]) => {
+const isSelected = highlightedItemKey === itemLabel;
+return (
+<button
+key={itemLabel}
+onClick={() => toggleSummaryHighlight(itemLabel)}
+className={`flex justify-between items-center px-3 py-1.5 rounded border text-xs font-semibold transition text-left ${
+isSelected
+? 'bg-amber-300 text-slate-900 border-amber-500 ring-2 ring-amber-400 font-bold shadow-sm'
+: 'bg-white hover:bg-emerald-100 text-slate-800 border-emerald-200'
+}`}
+>
+<span>{itemLabel}</span>
+<span className={`${isSelected ? 'bg-slate-900 text-white' : 'bg-emerald-600 text-white'} px-2 py-0.5 rounded font-bold ml-2`}>
+{totalQty}
+</span>
+</button>
+);
+})}
 </div>
 </div>
 )}
@@ -617,6 +631,8 @@ No items requested for {selectedRun} in today's delivery note.
 {items.map(item => {
 const isChecked = !!checkedItems[item.id];
 const itemType = getItemType(item.name);
+const itemKey = `${item.name} (${item.unit})`;
+const isHighlighted = highlightedItemKey === itemKey;
 
 const badgeStyles = {
 "FREEZER": "bg-cyan-100 text-cyan-900 border border-cyan-200",
@@ -628,7 +644,13 @@ return (
 <div
 key={item.id}
 onClick={() => toggleCheck(item.id)}
-className={`py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${isChecked ? 'bg-slate-50 opacity-60' : 'hover:bg-slate-50'}`}
+className={`py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${
+isChecked
+? 'bg-slate-50 opacity-60'
+: isHighlighted
+? 'bg-amber-100 text-amber-950 font-bold border-l-4 border-amber-500 shadow-sm'
+: 'hover:bg-slate-50'
+}`}
 >
 <div className="flex items-center gap-3">
 <input
@@ -637,7 +659,7 @@ checked={isChecked}
 onChange={() => {}}
 className="w-5 h-5 accent-emerald-600 rounded cursor-pointer"
 />
-<span className={`text-sm font-medium ${isChecked ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+<span className={`text-sm ${isChecked ? 'line-through text-slate-400 font-normal' : isHighlighted ? 'text-amber-950 font-bold text-base' : 'text-slate-800 font-medium'}`}>
 {item.name}
 </span>
 {selectedRun === "ED - DAVE" && (
@@ -647,8 +669,8 @@ className="w-5 h-5 accent-emerald-600 rounded cursor-pointer"
 )}
 </div>
 
-<div className="text-sm font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-md">
-{item.qty} <span className="text-xs font-normal text-slate-500">{item.unit}</span>
+<div className={`text-sm font-bold px-3 py-1 rounded-md ${isHighlighted ? 'bg-amber-300 text-slate-900 border border-amber-400' : 'bg-slate-100 text-slate-900'}`}>
+{item.qty} <span className="text-xs font-normal text-slate-600">{item.unit}</span>
 </div>
 </div>
 );
