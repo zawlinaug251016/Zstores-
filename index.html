@@ -75,7 +75,8 @@ const MEDI_HOTEL_WARDS = ["emergency", "m8", "m7", "m6", "m5"];
 
 const REHAB_FREEZER_KEYWORDS = [
 "butter pc", "margarine pc", "ice cream", "carrot cake",
-"white bread", "wholemeal bread", "multigrain bread", "le moulin"
+"white bread", "wholemeal bread", "multigrain bread", "le moulin",
+"apple puree", "diced pears", "diced peaches", "riviana"
 ];
 
 const AFTERNOON_KEYWORDS = [
@@ -138,7 +139,7 @@ return dateStr;
 function App() {
 const [rules, setRules] = useState(() => {
 try {
-const saved = localStorage.getItem('zstores_rules_v15');
+const saved = localStorage.getItem('zstores_rules_v16');
 return saved ? JSON.parse(saved) : DEFAULT_RULES;
 } catch(e) {
 return DEFAULT_RULES;
@@ -147,16 +148,16 @@ return DEFAULT_RULES;
 
 const [parsedData, setParsedData] = useState([]);
 const [deliveryDate, setDeliveryDate] = useState("");
-const [selectedRun, setSelectedRun] = useState("AFTERNOON RUN");
+const [selectedRun, setSelectedRun] = useState("FREEZER RUN");
 const [checkedItems, setCheckedItems] = useState({});
 const [activeTab, setActiveTab] = useState("picker");
 const [newCategoryItem, setNewCategoryItem] = useState("");
-const [targetCategory, setTargetCategory] = useState("AFTERNOON RUN");
+const [targetCategory, setTargetCategory] = useState("FREEZER RUN");
 const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 try {
-localStorage.setItem('zstores_rules_v15', JSON.stringify(rules));
+localStorage.setItem('zstores_rules_v16', JSON.stringify(rules));
 } catch(e) {}
 }, [rules]);
 
@@ -290,7 +291,6 @@ const possibleName = lines[i + 3];
 if (possibleQty.match(/^\d+$/) && (possibleUnit === "Each" || possibleUnit === "Litre" || possibleUnit === "Kilogram")) {
 const assignedCategory = getCategory(possibleName, currentWard);
 
-// Only add item if it wasn't blocked (category is not null)
 if (assignedCategory !== null) {
 orders.push({
 id: `${currentWard}-${possibleName}-${Math.random()}`,
