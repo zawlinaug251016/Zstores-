@@ -5,13 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Zstores - Hospital Order Dispatch</title>
 
+<!-- Gemini-inspired Z SVG Favicon & Apple Touch Icon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><defs><linearGradient id='gZ' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%231A73E8'/><stop offset='35%' stop-color='%238E24AA'/><stop offset='70%' stop-color='%23E91E63'/><stop offset='100%' stop-color='%23FFB300'/></linearGradient><radialGradient id='bG' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='%232563EB' stop-opacity='0.4'/><stop offset='60%' stop-color='%231E3A8A' stop-opacity='0.15'/><stop offset='100%' stop-color='%230F172A' stop-opacity='0'/></radialGradient><filter id='gw' x='-20%' y='-20%' width='140%' height='140%'><feGaussianBlur stdDeviation='14' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter></defs><rect width='500' height='500' rx='100' fill='%230B1329'/><circle cx='250' cy='250' r='220' fill='url(%23bG)'/><path d='M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z' fill='url(%23gZ)' filter='url(%23gw)'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><rect width='500' height='500' rx='100' fill='%230B1329'/><path d='M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z' fill='%231A73E8'/></svg>">
+<meta name="theme-color" content="#0B1329" />
+
+<!-- React & ReactDOM CDN -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 
+<!-- Babel CDN for inline JSX -->
 <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 
+<!-- PDF.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
+<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -33,7 +42,38 @@ if (typeof pdfjsLib !== 'undefined') {
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
+// Gemini Z Logo Component
+const GeminiZLogo = () => (
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" className="w-9 h-9 flex-shrink-0">
+<defs>
+<linearGradient id="hdrGeminiZ" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stopColor="#1A73E8" />
+<stop offset="35%" stopColor="#8E24AA" />
+<stop offset="70%" stopColor="#E91E63" />
+<stop offset="100%" stopColor="#FFB300" />
+</linearGradient>
+<radialGradient id="hdrBlueGlow" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stopColor="#2563EB" stopOpacity="0.4" />
+<stop offset="60%" stopColor="#1E3A8A" stopOpacity="0.15" />
+<stop offset="100%" stopColor="#0F172A" stopOpacity="0" />
+</radialGradient>
+<filter id="hdrGlow" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur stdDeviation="14" result="blur" />
+<feComposite in="SourceGraphic" in2="blur" operator="over" />
+</filter>
+</defs>
+<rect width="500" height="500" rx="100" fill="#0B1329" />
+<circle cx="250" cy="250" r="220" fill="url(#hdrBlueGlow)" />
+<path
+d="M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z"
+fill="url(#hdrGeminiZ)"
+filter="url(#hdrGlow)"
+/>
+</svg>
+);
+
 const DEFAULT_RULES = {
+"ED - DAVE": [],
 "ZAW REHAB RUN": [
 "Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes",
 "Cheese - Cheddar PC", "Rice Pudding", "Custard PC",
@@ -71,10 +111,10 @@ const DEFAULT_RULES = {
 };
 
 const REHAB_WARDS = ["fshrehab2", "fshrehab1", "fshrehabground", "fshmentalhealtha", "rehab2", "rehab1", "rehabground", "mentalhealtha", "mentalhealth"];
-const MEDI_HOTEL_WARDS = ["emergency", "m8", "m7", "m6", "m5"];
+const MEDI_HOTEL_WARDS = ["m8", "m7", "m6", "m5"];
 
 const REHAB_FREEZER_KEYWORDS = [
-"butter pc", "margarine pc", "ice cream", "carrot cake",
+"butter pc", "margarine pc", "ice cream", "ice-cream", "carrot cake",
 "white bread", "wholemeal bread", "multigrain bread", "le moulin",
 "apple puree", "diced pears", "diced peaches", "riviana"
 ];
@@ -93,8 +133,7 @@ const JUICE_WARD_ORDER = [
 "FSH 3AB", "3AB", "FSH 4AB", "4AB", "FSH 5AB", "5AB", "FSH 6AB", "6AB", "FSH 7AB", "7AB",
 "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
 "FSH CCU", "CCU", "FSH ICU", "ICU",
-"FSH - M8", "M8", "FSH - M7", "M7", "FSH - M6", "M6", "FSH - M5", "M5",
-"FSH Emergency", "Emergency"
+"FSH - M8", "M8", "FSH - M7", "M7", "FSH - M6", "M6", "FSH - M5", "M5"
 ];
 
 const CHILLER_WARD_ORDER = [
@@ -103,8 +142,7 @@ const CHILLER_WARD_ORDER = [
 "FSH CCU", "CCU", "FSH ICU", "ICU",
 "FSH 7AB", "7AB", "FSH 6AB", "6AB", "FSH 5AB", "5AB", "FSH 4AB", "4AB", "FSH 3AB", "3AB",
 "FSH SSU", "SSU",
-"FSH - M8", "M8", "FSH - M7", "M7", "FSH - M6", "M6", "FSH - M5", "M5",
-"FSH Emergency", "Emergency"
+"FSH - M8", "M8", "FSH - M7", "M7", "FSH - M6", "M6", "FSH - M5", "M5"
 ];
 
 const ZAW_REHAB_WARD_ORDER = ["Rehab Ground", "FSH-Rehab Ground", "Rehab 2", "FSH-Rehab 2", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
@@ -139,7 +177,7 @@ return dateStr;
 function App() {
 const [rules, setRules] = useState(() => {
 try {
-const saved = localStorage.getItem('zstores_rules_v16');
+const saved = localStorage.getItem('zstores_rules_v19');
 return saved ? JSON.parse(saved) : DEFAULT_RULES;
 } catch(e) {
 return DEFAULT_RULES;
@@ -148,35 +186,69 @@ return DEFAULT_RULES;
 
 const [parsedData, setParsedData] = useState([]);
 const [deliveryDate, setDeliveryDate] = useState("");
-const [selectedRun, setSelectedRun] = useState("FREEZER RUN");
+const [selectedRun, setSelectedRun] = useState("ED - DAVE");
 const [checkedItems, setCheckedItems] = useState({});
 const [activeTab, setActiveTab] = useState("picker");
 const [newCategoryItem, setNewCategoryItem] = useState("");
-const [targetCategory, setTargetCategory] = useState("FREEZER RUN");
+const [targetCategory, setTargetCategory] = useState("ED - DAVE");
 const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 try {
-localStorage.setItem('zstores_rules_v16', JSON.stringify(rules));
+localStorage.setItem('zstores_rules_v19', JSON.stringify(rules));
 } catch(e) {}
 }, [rules]);
 
-const isChilledItem = (itemName) => {
+const getItemType = (itemName) => {
 const lower = itemName.toLowerCase();
-const chillerKeywords = [...(rules["CHILLER RUN"] || []), "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese", "sandwich"];
-return chillerKeywords.some(kw => lower.includes(kw.toLowerCase()));
+
+// Explicit Freezer items
+if (lower.includes("ice cream") || lower.includes("ice-cream") || lower.includes("bulla")) {
+return "FREEZER";
+}
+
+// Explicit Dry items (Soy, Lactose Free, Rice Milk, Tea, Sugar, Biscuits)
+if (
+lower.includes("soy milk") ||
+lower.includes("lactose free") ||
+lower.includes("rice milk") ||
+lower.includes("vitasoy") ||
+lower.includes("so good") ||
+lower.includes("little things") ||
+lower.includes("sugar") ||
+lower.includes("tea") ||
+lower.includes("coffee") ||
+lower.includes("cracker") ||
+lower.includes("biscuit")
+) {
+return "DRY";
+}
+
+// Chiller items
+const chillerKeywords = [...(rules["CHILLER RUN"] || []), "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese", "sandwich", "ice coffee", "iced coffee", "chill"];
+if (chillerKeywords.some(kw => lower.includes(kw.toLowerCase()))) {
+return "CHILLER";
+}
+
+return "DRY";
 };
 
 const getCategory = (itemName, wardName) => {
 const lowerItem = itemName.toLowerCase();
 const cleanWard = wardName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-// 1. Medi Hotel Wards
-if (MEDI_HOTEL_WARDS.some(mw => cleanWard.includes(mw))) {
-return isChilledItem(itemName) ? "MEDI HOTEL - CHILLER" : "MEDI HOTEL - DRY";
+// 1. Standalone ED - DAVE Run (FSH Emergency)
+if (cleanWard.includes("emergency") || cleanWard.includes("ed")) {
+return "ED - DAVE";
 }
 
-// 2. Rehab & Mental Health Wards
+// 2. Medi Hotel Wards
+if (MEDI_HOTEL_WARDS.some(mw => cleanWard.includes(mw))) {
+const itemType = getItemType(itemName);
+return itemType === "CHILLER" ? "MEDI HOTEL - CHILLER" : "MEDI HOTEL - DRY";
+}
+
+// 3. Rehab & Mental Health Wards
 const isRehabWard = REHAB_WARDS.some(rw => cleanWard.includes(rw));
 if (isRehabWard) {
 const isFreezerItem = REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw));
@@ -189,33 +261,33 @@ const isZawItem = zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase()));
 return isZawItem ? "ZAW REHAB RUN" : "STEVE.M REHAB RUN";
 }
 
-// 3. General Wards - Explicit Route Rules & Exclusions
+// 4. General Wards - Exclusions & Route Rules
 
-// STRICT BLOCK: Bread ordered by general wards is completely dropped (returns null)
+// Drop general ward bread
 const isBreadItem = BREAD_KEYWORDS.some(kw => lowerItem.includes(kw));
 if (isBreadItem) {
 return null;
 }
 
-// RULE: Sandwiches MUST go to CHILLER RUN (never PANTRY RUN)
+// Sandwiches to CHILLER RUN
 if (lowerItem.includes("sandwich") || lowerItem.includes("ham & salad") || lowerItem.includes("egg mayo")) {
 return "CHILLER RUN";
 }
 
-// RULE: Fresh Fruit & Carrot Cake MUST go to AFTERNOON RUN (never PANTRY RUN)
+// Fresh Fruit & Carrot Cake to AFTERNOON RUN
 const isAfternoonItem = AFTERNOON_KEYWORDS.some(kw => lowerItem.includes(kw));
 if (isAfternoonItem) {
 return "AFTERNOON RUN";
 }
 
-// RULE: Thickened items to PANTRY RUN
+// Thickened items to PANTRY RUN
 if (lowerItem.includes("thick") || lowerItem.includes("level")) {
 return "PANTRY RUN";
 }
 
-// 4. Custom User Rules Matching
+// 5. Custom User Rules Matching
 for (const [category, keywords] of Object.entries(rules)) {
-if (["ZAW REHAB RUN", "STEVE.M REHAB RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
+if (["ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
 if (keywords.some(kw => lowerItem.includes(kw.toLowerCase()))) {
 return category;
 }
@@ -354,6 +426,18 @@ if (!grouped[item.ward]) grouped[item.ward] = [];
 grouped[item.ward].push(item);
 });
 
+// For ED - DAVE, sort internal items: FREEZER (0) -> CHILLER (1) -> DRY (2)
+if (selectedRun === "ED - DAVE") {
+const typePriority = { "FREEZER": 0, "CHILLER": 1, "DRY": 2 };
+Object.keys(grouped).forEach(wardKey => {
+grouped[wardKey].sort((a, b) => {
+const typeA = getItemType(a.name);
+const typeB = getItemType(b.name);
+return typePriority[typeA] - typePriority[typeB];
+});
+});
+}
+
 if (selectedRun === "CHILLER RUN") {
 return sortWardsByOrder(grouped, CHILLER_WARD_ORDER);
 } else if (selectedRun === "JUICE RUN") {
@@ -388,7 +472,7 @@ setRules(prev => ({
 };
 
 const availableCategories = [
-"ZAW REHAB RUN", "STEVE.M REHAB RUN", "JUICE RUN",
+"ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "JUICE RUN",
 "CHILLER RUN", "DRY RUN", "FREEZER RUN", "AFTERNOON RUN",
 "PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
 ];
@@ -396,9 +480,14 @@ const availableCategories = [
 return (
 <div className="max-w-6xl mx-auto p-4 md:p-6">
 <header className="no-print bg-slate-900 text-white p-4 rounded-xl shadow-lg mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+<div className="flex items-center gap-3">
+<GeminiZLogo />
 <div>
-<h1 className="text-2xl font-bold tracking-wide text-emerald-400">Zstores</h1>
+<h1 className="text-2xl font-bold tracking-wide bg-gradient-to-r from-blue-400 via-purple-400 to-amber-400 bg-clip-text text-transparent">
+Zstores
+</h1>
 <p className="text-slate-400 text-xs">Hospital Store Category Run Dispatch System</p>
+</div>
 </div>
 
 <div className="flex items-center gap-3">
@@ -447,7 +536,7 @@ Processing PDF Delivery Note...
 )}
 
 {parsedData.length > 0 && (
-<div className="no-print grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
+<div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
 {availableCategories.map(category => {
 const count = parsedData.filter(i => i.category === category).length;
 const isSelected = selectedRun === category;
@@ -474,7 +563,11 @@ isSelected
 <div className="mb-4 flex justify-between items-end border-b pb-3">
 <div>
 <h2 className="text-xl font-bold text-slate-800">{selectedRun} DELIVERY LIST</h2>
-<p className="text-xs text-slate-500">Sorted in fixed route print sequence</p>
+<p className="text-xs text-slate-500">
+{selectedRun === "ED - DAVE"
+? "Sorted: Freezer (Top) ➔ Chiller (Middle) ➔ Dry (Bottom)"
+: "Sorted in fixed route print sequence"}
+</p>
 </div>
 <div className="flex items-center gap-2">
 {deliveryDate && (
@@ -523,6 +616,14 @@ No items requested for {selectedRun} in today's delivery note.
 <div className="divide-y divide-slate-100">
 {items.map(item => {
 const isChecked = !!checkedItems[item.id];
+const itemType = getItemType(item.name);
+
+const badgeStyles = {
+"FREEZER": "bg-cyan-100 text-cyan-900 border border-cyan-200",
+"CHILLER": "bg-blue-100 text-blue-900 border border-blue-200",
+"DRY": "bg-amber-100 text-amber-900 border border-amber-200"
+};
+
 return (
 <div
 key={item.id}
@@ -539,6 +640,11 @@ className="w-5 h-5 accent-emerald-600 rounded cursor-pointer"
 <span className={`text-sm font-medium ${isChecked ? 'line-through text-slate-400' : 'text-slate-800'}`}>
 {item.name}
 </span>
+{selectedRun === "ED - DAVE" && (
+<span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badgeStyles[itemType]}`}>
+{itemType}
+</span>
+)}
 </div>
 
 <div className="text-sm font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-md">
@@ -612,7 +718,7 @@ Add Item Rule
 
 <div className="flex flex-wrap gap-1.5">
 {keywords.length === 0 ? (
-<span className="text-xs text-slate-400 italic">All items not matched in other categories automatically fall here.</span>
+<span className="text-xs text-slate-400 italic">All items matching this ward route here automatically.</span>
 ) : (
 keywords.map((kw, idx) => (
 <span key={idx} className="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md flex items-center gap-2 border border-slate-200">
