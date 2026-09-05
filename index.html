@@ -75,7 +75,7 @@ filter="url(#hdrGlow)"
 const DEFAULT_RULES = {
 "ED - DAVE": [],
 "ZAW REHAB COLD RUN": [
-"Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes",
+"Brownes", "Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes", "Hilo Milk - Brownes",
 "Cheese - Cheddar PC", "Rice Pudding", "Custard PC",
 "Vanilla Yogurt PC", "Vanilla Yoghurt PC", "Strawberry Yogurt PC", "Strawberry Yoghurt PC",
 "Apple Juice PC", "Orange Juice PC", "Fresh Apple", "Apple Fresh", "Ice Coffee", "Iced Coffee",
@@ -86,7 +86,7 @@ const DEFAULT_RULES = {
 "Apple Juice", "Orange Juice", "Diced Peaches", "Diced Pears"
 ],
 "CHILLER RUN": [
-"Full Cream Milk", "Hilo Milk", "Hilo PC Milk",
+"Full Cream Milk", "Hilo Milk", "Hilo PC Milk", "Brownes",
 "Vanilla Yoghurt", "Strawberry Yoghurt", "Strawberry Yogurt",
 "Rice Pudding", "Custard", "Cheese - Cheddar", "Cheddar PC",
 "Sandwich", "Ham & Salad", "Egg Mayo"
@@ -110,7 +110,7 @@ const DEFAULT_RULES = {
 "MEDI HOTEL - DRY": []
 };
 
-const REHAB_WARDS = ["fshrehab2", "fshrehab1", "fshrehabground", "fshmentalhealtha", "rehab2", "rehab1", "rehabground", "mentalhealtha", "mentalhealth"];
+const REHAB_WARDS = ["fshrehab2", "fshrehab1", "fshrehabground", "fshrehabg", "fshmentalhealtha", "rehab2", "rehab1", "rehabground", "rehabg", "mentalhealtha", "mentalhealth"];
 const MEDI_HOTEL_WARDS = ["m8", "m7", "m6", "m5"];
 
 const REHAB_FREEZER_KEYWORDS = [
@@ -128,7 +128,7 @@ const BREAD_KEYWORDS = [
 ];
 
 const JUICE_WARD_ORDER = [
-"Mental Health", "Mental Health A", "Rehab 2", "Rehab Ground", "Rehab 1",
+"Mental Health", "Mental Health A", "Rehab 2", "Rehab Ground", "Rehab G", "Rehab 1",
 "FSH SSU", "SSU",
 "FSH 3AB", "3AB", "FSH 4AB", "4AB", "FSH 5AB", "5AB", "FSH 6AB", "6AB", "FSH 7AB", "7AB",
 "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
@@ -137,7 +137,7 @@ const JUICE_WARD_ORDER = [
 ];
 
 const CHILLER_WARD_ORDER = [
-"Mental Health", "Rehab Ground", "Rehab 2", "Rehab 1",
+"Mental Health", "Rehab Ground", "Rehab G", "Rehab 2", "Rehab 1",
 "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
 "FSH CCU", "CCU", "FSH ICU", "ICU",
 "FSH 7AB", "7AB", "FSH 6AB", "6AB", "FSH 5AB", "5AB", "FSH 4AB", "4AB", "FSH 3AB", "3AB",
@@ -145,8 +145,8 @@ const CHILLER_WARD_ORDER = [
 "FSH - M8", "M8", "FSH - M7", "M7", "FSH - M6", "M6", "FSH - M5", "M5"
 ];
 
-const ZAW_REHAB_WARD_ORDER = ["Rehab Ground", "FSH-Rehab Ground", "Rehab 2", "FSH-Rehab 2", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
-const STEVE_REHAB_WARD_ORDER = ["Rehab 2", "FSH-Rehab 2", "Rehab Ground", "FSH-Rehab Ground", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
+const ZAW_REHAB_WARD_ORDER = ["Rehab Ground", "FSH-Rehab Ground", "Rehab G", "FSH-Rehab G", "Rehab 2", "FSH-Rehab 2", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
+const STEVE_REHAB_WARD_ORDER = ["Rehab 2", "FSH-Rehab 2", "Rehab Ground", "FSH-Rehab Ground", "Rehab G", "FSH-Rehab G", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
 
 const STANDARD_RUN_WARD_ORDER = [
 "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
@@ -209,7 +209,7 @@ return <span>{name}</span>;
 function App() {
 const [rules, setRules] = useState(() => {
 try {
-const saved = localStorage.getItem('zstores_rules_v23');
+const saved = localStorage.getItem('zstores_rules_v24');
 return saved ? JSON.parse(saved) : DEFAULT_RULES;
 } catch(e) {
 return DEFAULT_RULES;
@@ -228,7 +228,7 @@ const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 try {
-localStorage.setItem('zstores_rules_v23', JSON.stringify(rules));
+localStorage.setItem('zstores_rules_v24', JSON.stringify(rules));
 } catch(e) {}
 }, [rules]);
 
@@ -259,7 +259,7 @@ lower.includes("biscuit")
 return "DRY";
 }
 
-const chillerKeywords = [...(rules["CHILLER RUN"] || []), "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese", "sandwich", "ice coffee", "iced coffee", "chill"];
+const chillerKeywords = [...(rules["CHILLER RUN"] || []), "brownes", "milk", "yoghurt", "yogurt", "custard", "pudding", "juice", "butter", "margarine", "cheese", "sandwich", "ice coffee", "iced coffee", "chill"];
 if (chillerKeywords.some(kw => lower.includes(kw.toLowerCase()))) {
 return "CHILLER";
 }
