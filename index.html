@@ -74,14 +74,14 @@ filter="url(#hdrGlow)"
 
 const DEFAULT_RULES = {
 "ED - DAVE": [],
-"ZAW REHAB RUN": [
+"ZAW REHAB COLD RUN": [
 "Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes",
 "Cheese - Cheddar PC", "Rice Pudding", "Custard PC",
 "Vanilla Yogurt PC", "Vanilla Yoghurt PC", "Strawberry Yogurt PC", "Strawberry Yoghurt PC",
 "Apple Juice PC", "Orange Juice PC", "Fresh Apple", "Apple Fresh", "Ice Coffee", "Iced Coffee",
 "Chocolate Chill", "Ham & Salad Sandwich", "Egg Mayo Sandwich"
 ],
-"STEVE.M REHAB RUN": [],
+"STEVE.M REHAB DRY RUN": [],
 "BEN JUICE RUN": [
 "Apple Juice", "Orange Juice", "Diced Peaches", "Diced Pears"
 ],
@@ -175,17 +175,17 @@ return dateStr;
 };
 
 function CategoryLabel({ name, isSelected }) {
-if (name === "ZAW REHAB RUN") {
+if (name === "ZAW REHAB COLD RUN") {
 return (
 <span>
-ZAW <span className={isSelected ? "bg-amber-300 text-slate-900 px-1 rounded font-extrabold" : "bg-yellow-300 text-slate-900 px-1 rounded font-bold"}>REHAB RUN</span>
+ZAW <span className={isSelected ? "bg-amber-300 text-slate-900 px-1 rounded font-extrabold" : "bg-yellow-300 text-slate-900 px-1 rounded font-bold"}>REHAB COLD RUN</span>
 </span>
 );
 }
-if (name === "STEVE.M REHAB RUN") {
+if (name === "STEVE.M REHAB DRY RUN") {
 return (
 <span>
-STEVE.M <span className={isSelected ? "bg-amber-300 text-slate-900 px-1 rounded font-extrabold" : "bg-yellow-300 text-slate-900 px-1 rounded font-bold"}>REHAB RUN</span>
+STEVE.M <span className={isSelected ? "bg-amber-300 text-slate-900 px-1 rounded font-extrabold" : "bg-yellow-300 text-slate-900 px-1 rounded font-bold"}>REHAB DRY RUN</span>
 </span>
 );
 }
@@ -209,7 +209,7 @@ return <span>{name}</span>;
 function App() {
 const [rules, setRules] = useState(() => {
 try {
-const saved = localStorage.getItem('zstores_rules_v21');
+const saved = localStorage.getItem('zstores_rules_v23');
 return saved ? JSON.parse(saved) : DEFAULT_RULES;
 } catch(e) {
 return DEFAULT_RULES;
@@ -228,7 +228,7 @@ const [isLoading, setIsLoading] = useState(false);
 
 useEffect(() => {
 try {
-localStorage.setItem('zstores_rules_v21', JSON.stringify(rules));
+localStorage.setItem('zstores_rules_v23', JSON.stringify(rules));
 } catch(e) {}
 }, [rules]);
 
@@ -287,9 +287,9 @@ if (isFreezerItem) {
 return "FREEZER RUN";
 }
 
-const zawKeywords = rules["ZAW REHAB RUN"] || DEFAULT_RULES["ZAW REHAB RUN"];
+const zawKeywords = rules["ZAW REHAB COLD RUN"] || DEFAULT_RULES["ZAW REHAB COLD RUN"];
 const isZawItem = zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase()));
-return isZawItem ? "ZAW REHAB RUN" : "STEVE.M REHAB RUN";
+return isZawItem ? "ZAW REHAB COLD RUN" : "STEVE.M REHAB DRY RUN";
 }
 
 const isBreadItem = BREAD_KEYWORDS.some(kw => lowerItem.includes(kw));
@@ -311,7 +311,7 @@ return "PANTRY RUN";
 }
 
 for (const [category, keywords] of Object.entries(rules)) {
-if (["ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
+if (["ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
 if (keywords.some(kw => lowerItem.includes(kw.toLowerCase()))) {
 return category;
 }
@@ -469,9 +469,9 @@ if (selectedRun === "CHILLER RUN") {
 return sortWardsByOrder(grouped, CHILLER_WARD_ORDER);
 } else if (selectedRun === "BEN JUICE RUN") {
 return sortWardsByOrder(grouped, JUICE_WARD_ORDER);
-} else if (selectedRun === "ZAW REHAB RUN") {
+} else if (selectedRun === "ZAW REHAB COLD RUN") {
 return sortWardsByOrder(grouped, ZAW_REHAB_WARD_ORDER);
-} else if (selectedRun === "STEVE.M REHAB RUN") {
+} else if (selectedRun === "STEVE.M REHAB DRY RUN") {
 return sortWardsByOrder(grouped, STEVE_REHAB_WARD_ORDER);
 } else if (["JAMES DRY RUN", "FREEZER RUN", "AFTERNOON RUN", "PANTRY RUN"].includes(selectedRun)) {
 return sortWardsByOrder(grouped, STANDARD_RUN_WARD_ORDER);
@@ -499,7 +499,7 @@ setRules(prev => ({
 };
 
 const availableCategories = [
-"ED - DAVE", "ZAW REHAB RUN", "STEVE.M REHAB RUN", "BEN JUICE RUN",
+"ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "BEN JUICE RUN",
 "CHILLER RUN", "JAMES DRY RUN", "FREEZER RUN", "AFTERNOON RUN",
 "PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
 ];
