@@ -251,6 +251,17 @@
 
     const normalizeLine = (str) => str.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
 
+    // Many item names already end with their own pack-size/unit hint,
+    // e.g. "Apple Puree PC - Riviana (each)" or "Full Cream Milk -
+    // Brownes (2 Litre)". Appending "(Each)" / "(Litre)" again for the
+    // pick-list label then reads as a duplicate, e.g. "(each) (Each)".
+    // Only append the parsed unit when the name doesn't already carry
+    // a recognizable unit hint of its own.
+    const UNIT_HINT_REGEX = /\((?:[^()]*\b(?:each|eaches|ea|litre|litres|liter|liters|kilogram|kilograms|kg|kgs)\b[^()]*)\)\s*$/i;
+    const getItemDisplayKey = (item) => (
+      UNIT_HINT_REGEX.test(item.name) ? item.name : `${item.name} (${item.unit})`
+    );
+
     // ============================================================
     // SMALL UI PRIMITIVES
     // ============================================================
@@ -445,15 +456,36 @@
 
             if (qtyMatch && nameLooksValid && unitLooksValid) {
               const canonicalUnit = UNIT_ALIASES[possibleUnit.trim().toLowerCase()];
+              const resolvedUnit = canonicalUnit || possibleUnit.trim();
               const assignedCategory = getCategory(possibleName, currentWard);
+
+              // Some item names carry their own unit hint in a trailing
+              // parenthetical, e.g. "... (Each)" or "... (2 Litre)". If
+              // that hint disagrees with the unit the PDF actually put
+              // on this row (e.g. name says "Each" but the row says
+              // "Litre"), that's worth a second look — flag it the same
+              // way as an unrecognized unit, rather than trusting
+              // whichever one happened to be extracted.
+              let unitConflictsWithName = false;
+              const nameHint = possibleName.match(/\(([^()]*)\)\s*$/);
+              if (nameHint) {
+                const hintLower = nameHint[1].toLowerCase();
+                const hintAliasKey = Object.keys(UNIT_ALIASES).find(alias => {
+                  const re = new RegExp(`\\b${alias}\\b`);
+                  return re.test(hintLower);
+                });
+                if (hintAliasKey && UNIT_ALIASES[hintAliasKey] !== resolvedUnit) {
+                  unitConflictsWithName = true;
+                }
+              }
 
               if (assignedCategory !== null) {
                 orders.push({
                   id: `${currentWard}-${possibleName}-${i}-${Math.random().toString(36).slice(2)}`,
                   ward: currentWard,
                   qty: parseFloat(possibleQty),
-                  unit: canonicalUnit || possibleUnit.trim(),
-                  unitVerified: Boolean(canonicalUnit),
+                  unit: resolvedUnit,
+                  unitVerified: Boolean(canonicalUnit) && !unitConflictsWithName,
                   name: possibleName,
                   category: assignedCategory
                 });
@@ -555,7 +587,7 @@
       const itemSummary = useMemo(() => {
         const totals = {};
         currentRunItems.forEach(item => {
-          const key = `${item.name} (${item.unit})`;
+          const key = getItemDisplayKey(item);
           totals[key] = (totals[key] || 0) + item.qty;
         });
         return totals;
@@ -568,7 +600,7 @@
       const itemPickStatus = useMemo(() => {
         const status = {};
         currentRunItems.forEach(item => {
-          const key = `${item.name} (${item.unit})`;
+          const key = getItemDisplayKey(item);
           if (!status[key]) status[key] = { total: 0, checkedCount: 0 };
           status[key].total += 1;
           if (checkedItems[item.id]) status[key].checkedCount += 1;
@@ -762,7 +794,7 @@
 
               {/* RUN CATEGORY SELECTOR */}
               {parsedData.length > 0 && (
-                <div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+                <div className="no-print grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-6">
                   {AVAILABLE_CATEGORIES.map(category => {
                     const items = parsedData.filter(i => i.category === category);
                     const count = items.length;
@@ -779,11 +811,13 @@
                             : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                         }`}
                       >
-                        <div className="text-xs font-bold tracking-wide opacity-90">
-                          <CategoryLabel name={category} isSelected={isSelected} />
-                        </div>
-                        <div className="text-xl font-bold mt-1 tabular-nums">
-                          {count} <span className="text-xs font-normal">items</span>
+                        <div className="flex items-center justify-between gap-2 sm:block">
+                          <div className="text-xs font-bold tracking-wide opacity-90 truncate">
+                            <CategoryLabel name={category} isSelected={isSelected} />
+                          </div>
+                          <div className="text-xl font-bold tabular-nums flex-shrink-0 sm:mt-1">
+                            {count} <span className="text-xs font-normal">items</span>
+                          </div>
                         </div>
                         {count > 0 && (
                           <div className="mt-2">
@@ -851,14 +885,14 @@
                               key={itemLabel}
                               onClick={() => toggleSummaryHighlight(itemLabel)}
                               aria-pressed={isSelected}
-                              className={`flex justify-between items-center px-3 py-1.5 rounded border text-xs font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                              className={`w-full flex justify-between items-center px-3 py-2 rounded border text-sm font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
                                 isSelected
                                   ? 'bg-amber-300 text-slate-900 border-amber-500 ring-2 ring-amber-400 font-bold shadow-sm'
                                   : 'bg-white hover:bg-emerald-100 text-slate-800 border-emerald-200'
                               }`}
                             >
-                              <span className="flex flex-col">
-                                <span>{itemLabel}</span>
+                              <span className="flex flex-col min-w-0">
+                                <span className="truncate">{itemLabel}</span>
                                 {isSelected && status && status.total > 1 && (
                                   <span className="text-[10px] font-medium text-amber-800 tabular-nums">
                                     {status.checkedCount}/{status.total} lines picked — stays lit till 100%
@@ -902,7 +936,7 @@
                             {items.map(item => {
                               const isChecked = !!checkedItems[item.id];
                               const itemType = getItemType(item.name);
-                              const itemKey = `${item.name} (${item.unit})`;
+                              const itemKey = getItemDisplayKey(item);
                               const isHighlighted = highlightedItemKey === itemKey;
 
                               const badgeStyles = {
@@ -952,7 +986,7 @@
                                       {item.name}
                                     </span>
                                     {!item.unitVerified && (
-                                      <span className="no-print text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0" title="Unit text wasn't one of the usual labels — double check it.">
+                                      <span className="no-print text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0" title="Unit wasn't a recognized label, or disagrees with the unit named in the item itself — double check it.">
                                         verify unit
                                       </span>
                                     )}
