@@ -794,7 +794,7 @@
 
               {/* RUN CATEGORY SELECTOR */}
               {parsedData.length > 0 && (
-                <div className="no-print grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+                <div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
                   {AVAILABLE_CATEGORIES.map(category => {
                     const items = parsedData.filter(i => i.category === category);
                     const count = items.length;
@@ -805,19 +805,18 @@
                         key={category}
                         onClick={() => setSelectedRun(category)}
                         aria-pressed={isSelected}
+                        style={{ width: '100%', boxSizing: 'border-box' }}
                         className={`p-3 rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
                           isSelected
                             ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
                             : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-2 sm:block">
-                          <div className="text-xs font-bold tracking-wide opacity-90 truncate">
-                            <CategoryLabel name={category} isSelected={isSelected} />
-                          </div>
-                          <div className="text-xl font-bold tabular-nums flex-shrink-0 sm:mt-1">
-                            {count} <span className="text-xs font-normal">items</span>
-                          </div>
+                        <div className="text-xs font-bold tracking-wide opacity-90">
+                          <CategoryLabel name={category} isSelected={isSelected} />
+                        </div>
+                        <div className="text-xl font-bold mt-1 tabular-nums">
+                          {count} <span className="text-xs font-normal">items</span>
                         </div>
                         {count > 0 && (
                           <div className="mt-2">
@@ -885,7 +884,8 @@
                               key={itemLabel}
                               onClick={() => toggleSummaryHighlight(itemLabel)}
                               aria-pressed={isSelected}
-                              className={`w-full flex justify-between items-center px-3 py-2 rounded border text-sm font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                              style={{ width: '100%', display: 'flex', boxSizing: 'border-box' }}
+                              className={`justify-between items-center px-3 py-2 rounded border text-sm font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
                                 isSelected
                                   ? 'bg-amber-300 text-slate-900 border-amber-500 ring-2 ring-amber-400 font-bold shadow-sm'
                                   : 'bg-white hover:bg-emerald-100 text-slate-800 border-emerald-200'
