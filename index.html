@@ -455,10 +455,25 @@
 
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
+          const lowerLine = line.toLowerCase();
 
-          if (line.toLowerCase().includes("for date:") || line.toLowerCase().includes("delivery note")) {
+          // "For Date" is the authoritative field on the delivery note —
+          // prefer it over any other date-shaped text in the document
+          // (page-print timestamps, reference numbers, etc). The colon
+          // isn't required, and if the label and the date value got
+          // split across two lines by PDF text extraction, check the
+          // next line too.
+          if (!extractedDate && lowerLine.includes("for date")) {
             const dateMatch = line.match(DATE_REGEX);
-            if (dateMatch && !extractedDate) extractedDate = formatDateDDMMYY(dateMatch[0]);
+            if (dateMatch) {
+              extractedDate = formatDateDDMMYY(dateMatch[0]);
+            } else if (i + 1 < lines.length) {
+              const nextMatch = lines[i + 1].match(DATE_REGEX);
+              if (nextMatch) extractedDate = formatDateDDMMYY(nextMatch[0]);
+            }
+          } else if (!extractedDate && lowerLine.includes("delivery note")) {
+            const dateMatch = line.match(DATE_REGEX);
+            if (dateMatch) extractedDate = formatDateDDMMYY(dateMatch[0]);
           }
 
           if (line.includes("FSH-") || line.toLowerCase().includes("rehab") || line.toLowerCase().includes("mental health") || line.toLowerCase().includes("emergency")) {
@@ -531,7 +546,7 @@
           }
         }
 
-        return { orders, unmatched };
+        return { orders, unmatched, extractedDate };
       }, [getCategory]);
 
       const handleFileUpload = async (event) => {
@@ -563,13 +578,7 @@
             throw new Error("No readable text found in this PDF. It may be a scanned image rather than a text-based delivery note.");
           }
 
-          const { orders, unmatched } = parseDeliveryNoteLines(fullTextLines);
-
-          let extractedDate = "";
-          for (const line of fullTextLines) {
-            const dateMatch = line.match(DATE_REGEX);
-            if (dateMatch) { extractedDate = formatDateDDMMYY(dateMatch[0]); break; }
-          }
+          const { orders, unmatched, extractedDate } = parseDeliveryNoteLines(fullTextLines);
 
           if (orders.length === 0) {
             setParseError("The PDF loaded, but no order lines were recognized. The delivery note format may have changed — check the Review panel and the original PDF.");
