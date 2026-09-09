@@ -63,7 +63,15 @@
     @media print {
       .no-print { display: none !important; }
       body { background: white; color: black; font-size: 11pt; }
-      .card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 0.6rem; page-break-inside: avoid; }
+      /* Cards (the whole pick-list summary panel, each ward group) can be
+         taller than a single printed page, so they must be allowed to
+         flow across a page break — forcing "don't break me" on the whole
+         box just pushes it entirely onto the next page, leaving the
+         previous one blank. Only individual rows need protecting from
+         being sliced in half by a page break. */
+      .card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 0.6rem; }
+      .print-row { page-break-inside: avoid; break-inside: avoid; }
+      .print-keep-with-next { page-break-after: avoid; break-after: avoid; }
       .print-checkbox {
         width: 14px; height: 14px; border: 1.5px solid #333; border-radius: 3px;
         display: inline-block; flex-shrink: 0;
@@ -920,7 +928,7 @@
                             <div
                               key={itemLabel}
                               style={{ width: '100%', display: 'flex', boxSizing: 'border-box', minWidth: 0 }}
-                              className={`items-stretch rounded border overflow-hidden transition min-w-0 ${
+                              className={`print-row items-stretch rounded border overflow-hidden transition min-w-0 ${
                                 fullyPicked
                                   ? 'bg-slate-50 border-slate-200 opacity-70'
                                   : isSelected
@@ -986,7 +994,7 @@
                         const wardDone = items.filter(i => checkedItems[i.id]).length;
                         return (
                         <div key={ward} className="card bg-white rounded-xl shadow-sm p-4 border border-slate-200">
-                          <div className="border-b pb-2 mb-3">
+                          <div className="print-keep-with-next border-b pb-2 mb-3">
                             <div className="flex justify-between items-center">
                               <span className="text-lg font-bold text-slate-900">{ward}</span>
                               <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full tabular-nums no-print">
@@ -1038,7 +1046,7 @@
                               return (
                                 <label
                                   key={item.id}
-                                  className={`py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${rowClass}`}
+                                  className={`print-row py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${rowClass}`}
                                 >
                                   <div className="flex items-center gap-3 min-w-0">
                                     <span className="print-checkbox" aria-hidden="true"></span>
