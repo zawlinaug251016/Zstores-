@@ -826,60 +826,56 @@ Reset checks
 </div>
 </div>
 
-{/* FIXED SUMMARY CONTAINER */}
+{/* CATERING PICK LIST SUMMARY (MATCHES WARD CARD STYLING & FULL-WIDTH STRETCH) */}
 {Object.keys(itemSummary).length > 0 && (
-<div className="card bg-emerald-50 border border-emerald-200 rounded-xl p-3 md:p-4 mb-6">
-<div className="flex justify-between items-center mb-2 border-b border-emerald-200 pb-1.5 flex-wrap gap-1">
-<h3 className="text-sm font-bold text-emerald-900 tracking-wide">
+<div className="card bg-white border border-slate-200 rounded-xl shadow-sm p-4 mb-6">
+<div className="border-b pb-2 mb-3 flex justify-between items-center flex-wrap gap-1">
+<div>
+<h3 className="text-base md:text-lg font-bold text-slate-900 tracking-tight">
 Catering store pick list summary
 </h3>
-<span className="text-[11px] text-emerald-700 font-medium">
-Tick to mark picked · tap the text to highlight below
+<p className="text-[11px] text-slate-500">
+Tick checkbox to pick all · tap row to highlight below
+</p>
+</div>
+<span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full tabular-nums no-print">
+{Object.keys(itemSummary).length} items
 </span>
 </div>
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+
+<div className="divide-y divide-slate-100 lg:divide-y-0 lg:grid lg:grid-cols-3 lg:gap-2">
 {Object.entries(itemSummary).map(([itemLabel, totalQty]) => {
 const isSelected = highlightedItemKey === itemLabel;
 const status = itemPickStatus[itemLabel];
 const fullyPicked = Boolean(status) && status.total > 0 && status.checkedCount === status.total;
 const partiallyPicked = Boolean(status) && status.checkedCount > 0 && !fullyPicked;
+
+let rowHighlight = 'hover:bg-slate-50';
+if (isSelected) {
+rowHighlight = 'bg-amber-100 text-amber-950 font-bold border-l-4 border-amber-500 shadow-sm';
+} else if (fullyPicked) {
+rowHighlight = 'bg-slate-50 opacity-60';
+}
+
 return (
 <div
 key={itemLabel}
-className={`w-full min-w-0 flex items-stretch rounded-lg border overflow-hidden transition ${
-fullyPicked
-? 'bg-slate-50 border-slate-200 opacity-70'
-: isSelected
-? 'bg-amber-300 border-amber-500 ring-2 ring-amber-400 shadow-sm'
-: 'bg-white border-emerald-200 hover:border-emerald-300'
-}`}
+className={`w-full min-w-0 flex items-center justify-between py-2.5 px-2 rounded transition ${rowHighlight} lg:border lg:border-slate-200 lg:rounded-lg lg:p-2.5`}
 >
-<label
-className="flex items-center pl-2.5 pr-1.5 cursor-pointer flex-shrink-0 bg-transparent"
-title="Mark every line for this item as picked"
->
+<div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
 <TriStateCheckbox
 checked={fullyPicked}
 indeterminate={partiallyPicked}
 onChange={() => toggleBulkPick(itemLabel, fullyPicked)}
 label={`Mark all ${itemLabel} lines as picked`}
 />
-</label>
-
 <button
 type="button"
 onClick={() => toggleSummaryHighlight(itemLabel)}
 aria-pressed={isSelected}
-className={`flex-1 min-w-0 flex items-center justify-between py-2 pl-1 pr-2.5 text-left focus:outline-none ${
-fullyPicked
-? 'text-slate-500'
-: isSelected
-? 'text-slate-900 font-bold'
-: 'text-slate-800'
-}`}
+className="flex-1 min-w-0 text-left focus:outline-none"
 >
-<div className="min-w-0 flex-1 pr-2">
-<div className={`text-xs md:text-sm font-semibold truncate ${fullyPicked ? 'line-through' : ''}`}>
+<div className={`text-sm truncate ${fullyPicked ? 'line-through text-slate-400 font-normal' : isSelected ? 'text-amber-950 font-bold' : 'text-slate-800 font-medium'}`}>
 {itemLabel}
 </div>
 {isSelected && !fullyPicked && status && status.total > 1 && (
@@ -892,17 +888,18 @@ fullyPicked
 {status.checkedCount}/{status.total} lines picked
 </div>
 )}
+</button>
 </div>
-<span className={`px-2 py-0.5 text-xs font-bold rounded-md tabular-nums flex-shrink-0 self-center ${
+
+<div className={`text-sm font-bold px-3 py-1 rounded-md tabular-nums flex-shrink-0 ${
 fullyPicked
 ? 'bg-slate-200 text-slate-600'
 : isSelected
-? 'bg-slate-900 text-white'
+? 'bg-amber-300 text-slate-900 border border-amber-400'
 : 'bg-emerald-600 text-white'
 }`}>
 {totalQty}
-</span>
-</button>
+</div>
 </div>
 );
 })}
