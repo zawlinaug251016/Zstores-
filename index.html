@@ -371,6 +371,11 @@
       const [fileName, setFileName] = useState("");
       const [selectedRun, setSelectedRun] = useState("ED - DAVE");
       const [checkedItems, setCheckedItems] = useState({});
+      // Ticking an item in the pick-list summary is a separate, standalone
+      // "picked this from the store shelf" mark — it's tracked here, keyed
+      // by run+item, and deliberately never touches the per-ward line
+      // checkboxes in `checkedItems` (and vice versa).
+      const [summaryPicked, setSummaryPicked] = useState({});
       const [highlightedItemKey, setHighlightedItemKey] = useState(null);
       const [activeTab, setActiveTab] = useState("picker");
       const [newCategoryItem, setNewCategoryItem] = useState("");
@@ -591,6 +596,7 @@
           setDeliveryDate(extractedDate);
           setFileName(file.name);
           setCheckedItems({});
+          setSummaryPicked({});
           setHighlightedItemKey(null);
           setShowReview(false);
         } catch (err) {
@@ -608,19 +614,11 @@
 
       const currentRunItems = useMemo(() => parsedData.filter(item => item.category === selectedRun), [parsedData, selectedRun]);
 
-      // Ticking the box on a pick-list summary line checks off every
-      // matching line across all wards in one go (and unchecks them all
-      // if it was already fully picked) — useful when one item is
-      // picked once from the store shelf but split across several wards.
-      const toggleBulkPick = (itemLabel, alreadyFullyPicked) => {
-        const matchingIds = currentRunItems
-          .filter(item => getItemDisplayKey(item) === itemLabel)
-          .map(item => item.id);
-        setCheckedItems(prev => {
-          const next = { ...prev };
-          matchingIds.forEach(id => { next[id] = !alreadyFullyPicked; });
-          return next;
-        });
+      // Ticking a pick-list summary line only flips that line's own mark —
+      // it never touches the ward rows below (see `summaryPicked` above).
+      const toggleSummaryPick = (itemLabel) => {
+        const key = `${selectedRun}|${itemLabel}`;
+        setSummaryPicked(prev => ({ ...prev, [key]: !prev[key] }));
       };
 
       const runCheckedCount = useMemo(
@@ -632,6 +630,11 @@
         setCheckedItems(prev => {
           const next = { ...prev };
           currentRunItems.forEach(item => { delete next[item.id]; });
+          return next;
+        });
+        setSummaryPicked(prev => {
+          const next = { ...prev };
+          Object.keys(itemSummary).forEach(label => { delete next[`${selectedRun}|${label}`]; });
           return next;
         });
       };
@@ -924,21 +927,21 @@
                           Catering store pick list summary
                         </h3>
                         <span className="text-[11px] text-emerald-700 font-medium">
-                          Tick to mark picked · tap the row to highlight it below
+                          Tick to mark picked from the store · tap the row to highlight it below
                         </span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {Object.entries(itemSummary).map(([itemLabel, totalQty]) => {
                           const isSelected = highlightedItemKey === itemLabel;
-                          const status = itemPickStatus[itemLabel];
-                          const fullyPicked = Boolean(status) && status.total > 0 && status.checkedCount === status.total;
-                          const partiallyPicked = Boolean(status) && status.checkedCount > 0 && !fullyPicked;
+                          const wardStatus = itemPickStatus[itemLabel];
+                          const wardPartiallyDone = Boolean(wardStatus) && wardStatus.checkedCount > 0 && wardStatus.checkedCount < wardStatus.total;
+                          const isTicked = Boolean(summaryPicked[`${selectedRun}|${itemLabel}`]);
                           return (
                             <div
                               key={itemLabel}
                               style={{ width: '100%', display: 'flex', boxSizing: 'border-box', minWidth: 0 }}
                               className={`print-row items-stretch rounded border overflow-hidden transition min-w-0 ${
-                                fullyPicked
+                                isTicked
                                   ? 'bg-slate-50 border-slate-200 opacity-70'
                                   : isSelected
                                   ? 'bg-amber-300 border-amber-500 ring-2 ring-amber-400 shadow-sm'
@@ -947,13 +950,13 @@
                             >
                               <label
                                 className="flex items-center pl-2 pr-1.5 cursor-pointer flex-shrink-0"
-                                title="Mark every line for this item as picked"
+                                title="Mark this item as picked from the store (doesn't affect ward rows below)"
                               >
                                 <TriStateCheckbox
-                                  checked={fullyPicked}
-                                  indeterminate={partiallyPicked}
-                                  onChange={() => toggleBulkPick(itemLabel, fullyPicked)}
-                                  label={`Mark all ${itemLabel} lines as picked`}
+                                  checked={isTicked}
+                                  indeterminate={false}
+                                  onChange={() => toggleSummaryPick(itemLabel)}
+                                  label={`Mark ${itemLabel} as picked from the store`}
                                 />
                               </label>
                               <button
@@ -961,7 +964,7 @@
                                 aria-pressed={isSelected}
                                 style={{ width: '100%', display: 'flex', minWidth: 0 }}
                                 className={`flex-1 min-w-0 justify-between items-center py-2 pr-3 pl-1 text-sm font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
-                                  fullyPicked
+                                  isTicked
                                     ? 'text-slate-500'
                                     : isSelected
                                     ? 'text-slate-900 font-bold'
@@ -969,19 +972,19 @@
                                 }`}
                               >
                                 <span className="flex flex-col min-w-0">
-                                  <span className={`truncate ${fullyPicked ? 'line-through' : ''}`}>{itemLabel}</span>
-                                  {isSelected && !fullyPicked && status && status.total > 1 && (
+                                  <span className={`truncate ${isTicked ? 'line-through' : ''}`}>{itemLabel}</span>
+                                  {isSelected && wardStatus && wardStatus.total > 1 && wardStatus.checkedCount < wardStatus.total && (
                                     <span className="text-[10px] font-medium text-amber-800 tabular-nums">
-                                      {status.checkedCount}/{status.total} lines picked — stays lit till 100%
+                                      {wardStatus.checkedCount}/{wardStatus.total} ward lines picked — stays lit till 100%
                                     </span>
                                   )}
-                                  {partiallyPicked && !isSelected && (
+                                  {wardPartiallyDone && !isSelected && (
                                     <span className="text-[10px] font-medium text-slate-500 tabular-nums">
-                                      {status.checkedCount}/{status.total} lines picked
+                                      {wardStatus.checkedCount}/{wardStatus.total} ward lines picked
                                     </span>
                                   )}
                                 </span>
-                                <span className={`px-2 py-0.5 rounded font-bold ml-2 tabular-nums flex-shrink-0 ${fullyPicked ? 'bg-slate-300 text-slate-700' : isSelected ? 'bg-slate-900 text-white' : 'bg-emerald-600 text-white'}`}>
+                                <span className={`px-2 py-0.5 rounded font-bold ml-2 tabular-nums flex-shrink-0 ${isTicked ? 'bg-slate-300 text-slate-700' : isSelected ? 'bg-slate-900 text-white' : 'bg-emerald-600 text-white'}`}>
                                   {totalQty}
                                 </span>
                               </button>
