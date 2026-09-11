@@ -1,1152 +1,1277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Zstores — Hospital Order Dispatch</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zstores — Hospital Order Dispatch</title>
 
-<link
-rel="icon"
-type="image/svg+xml"
-href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><defs><linearGradient id='gZ' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231A73E8'/><stop offset='35%25' stop-color='%238E24AA'/><stop offset='70%25' stop-color='%23E91E63'/><stop offset='100%25' stop-color='%23FFB300'/></linearGradient><radialGradient id='bG' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%232563EB' stop-opacity='0.4'/><stop offset='60%25' stop-color='%231E3A8A' stop-opacity='0.15'/><stop offset='100%25' stop-color='%230F172A' stop-opacity='0'/></radialGradient><filter id='gw' x='-20%25' y='-20%25' width='140%25' height='140%25'><feGaussianBlur stdDeviation='14' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter></defs><rect width='500' height='500' rx='100' fill='%230B1329'/><circle cx='250' cy='250' r='220' fill='url(%23bG)'/><path d='M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z' fill='url(%23gZ)' filter='url(%23gw)'/></svg>"
-/>
-<link
-rel="apple-touch-icon"
-href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><rect width='500' height='500' rx='100' fill='%230B1329'/><path d='M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z' fill='%231A73E8'/></svg>"
-/>
-<meta name="theme-color" content="#0B1329" />
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><defs><linearGradient id='gZ' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231A73E8'/><stop offset='35%25' stop-color='%238E24AA'/><stop offset='70%25' stop-color='%23E91E63'/><stop offset='100%25' stop-color='%23FFB300'/></linearGradient><radialGradient id='bG' cx='50%25' cy='50%25' r='50%25'><stop offset='0%25' stop-color='%232563EB' stop-opacity='0.4'/><stop offset='60%25' stop-color='%231E3A8A' stop-opacity='0.15'/><stop offset='100%25' stop-color='%230F172A' stop-opacity='0'/></radialGradient><filter id='gw' x='-20%25' y='-20%25' width='140%25' height='140%25'><feGaussianBlur stdDeviation='14' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter></defs><rect width='500' height='500' rx='100' fill='%230B1329'/><circle cx='250' cy='250' r='220' fill='url(%23bG)'/><path d='M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z' fill='url(%23gZ)' filter='url(%23gw)'/></svg>"
+  />
+  <link
+    rel="apple-touch-icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'><rect width='500' height='500' rx='100' fill='%230B1329'/><path d='M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z' fill='%231A73E8'/></svg>"
+  />
+  <meta name="theme-color" content="#0B1329" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet" />
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-theme: {
-extend: {
-fontFamily: {
-sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-display: ['Inter Tight', 'Inter', 'ui-sans-serif', 'sans-serif'],
-},
-colors: {
-ink: '#0B1329',
-},
-},
-},
-};
-</script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            display: ['Inter Tight', 'Inter', 'ui-sans-serif', 'sans-serif'],
+          },
+          colors: {
+            ink: '#0B1329',
+          },
+        },
+      },
+    };
+  </script>
 
-<style>
-html { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
-.font-display { font-family: 'Inter Tight', 'Inter', ui-sans-serif, sans-serif; }
-.tabular-nums { font-variant-numeric: tabular-nums; }
+  <style>
+    html {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      width: 100%;
+      min-width: 0;
+      -webkit-text-size-adjust: 100%;
+    }
 
-/* iOS Safari renders <button> with native styling unless stripped */
-button {
--webkit-appearance: none;
-appearance: none;
-margin: 0;
-}
+    body {
+      margin: 0;
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+    }
 
-::-webkit-scrollbar { height: 8px; width: 8px; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
+    #root {
+      width: 100%;
+      min-width: 0;
+    }
 
-@media (prefers-reduced-motion: reduce) {
-* { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
-}
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
-@keyframes zs-fade-in {
-from { opacity: 0; transform: translateY(4px); }
-to { opacity: 1; transform: translateY(0); }
-}
-.zs-enter { animation: zs-fade-in 0.25s ease-out both; }
+    .font-display { font-family: 'Inter Tight', 'Inter', ui-sans-serif, sans-serif; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
 
-@media print {
-.no-print { display: none !important; }
-body { background: white; color: black; font-size: 11pt; }
-.card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 0.6rem; }
-.print-row { page-break-inside: avoid; break-inside: avoid; }
-.print-keep-with-next { page-break-after: avoid; break-after: avoid; }
-.print-checkbox {
-width: 14px; height: 14px; border: 1.5px solid #333; border-radius: 3px;
-display: inline-block; flex-shrink: 0;
-}
-.print-header { display: flex !important; }
-}
-.print-header { display: none; }
-</style>
+    /* iOS Safari can calculate an auto-width grid/block differently from
+       Android/desktop when a descendant contains intrinsic text widths.
+       Keep the main content and cards explicitly stretchable. */
+    .zs-page,
+    .zs-delivery-details,
+    .zs-summary-card,
+    .zs-summary-grid,
+    .zs-ward-list,
+    .zs-ward-card {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    /* iOS Safari renders <button> with its own native control chrome
+       (appearance) even after custom border/background/rounded-corner
+       classes are applied — this can make a button's visible box sit
+       slightly inset from its true CSS width, which is exactly what
+       showed up as "not edge to edge" only on iPhone (Chrome/Android
+       and desktop browsers don't apply this native styling). Stripping
+       appearance makes buttons render as plain boxes everywhere. */
+    button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+
+    ::-webkit-scrollbar { height: 8px; width: 8px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
+    }
+
+    @keyframes zs-fade-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .zs-enter { animation: zs-fade-in 0.25s ease-out both; }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; color: black; font-size: 11pt; }
+      /* Cards (the whole pick-list summary panel, each ward group) can be
+         taller than a single printed page, so they must be allowed to
+         flow across a page break — forcing "don't break me" on the whole
+         box just pushes it entirely onto the next page, leaving the
+         previous one blank. Only individual rows need protecting from
+         being sliced in half by a page break. */
+      .card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 0.6rem; }
+      .print-row { page-break-inside: avoid; break-inside: avoid; }
+      .print-keep-with-next { page-break-after: avoid; break-after: avoid; }
+      .print-checkbox {
+        width: 14px; height: 14px; border: 1.5px solid #333; border-radius: 3px;
+        display: inline-block; flex-shrink: 0;
+      }
+      .print-header { display: flex !important; }
+    }
+    .print-header { display: none; }
+  </style>
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
-<div id="root"></div>
-
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useCallback } = React;
-
-if (typeof pdfjsLib !== 'undefined') {
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-}
-
-// ============================================================
-// LOGO
-// ============================================================
-const GeminiZLogo = ({ className = "w-9 h-9" }) => (
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" className={`${className} flex-shrink-0`}>
-<defs>
-<linearGradient id="hdrGeminiZ" x1="0%" y1="0%" x2="100%" y2="100%">
-<stop offset="0%" stopColor="#1A73E8" />
-<stop offset="35%" stopColor="#8E24AA" />
-<stop offset="70%" stopColor="#E91E63" />
-<stop offset="100%" stopColor="#FFB300" />
-</linearGradient>
-<radialGradient id="hdrBlueGlow" cx="50%" cy="50%" r="50%">
-<stop offset="0%" stopColor="#2563EB" stopOpacity="0.4" />
-<stop offset="60%" stopColor="#1E3A8A" stopOpacity="0.15" />
-<stop offset="100%" stopColor="#0F172A" stopOpacity="0" />
-</radialGradient>
-<filter id="hdrGlow" x="-20%" y="-20%" width="140%" height="140%">
-<feGaussianBlur stdDeviation="14" result="blur" />
-<feComposite in="SourceGraphic" in2="blur" operator="over" />
-</filter>
-</defs>
-<rect width="500" height="500" rx="100" fill="#0B1329" />
-<circle cx="250" cy="250" r="220" fill="url(#hdrBlueGlow)" />
-<path
-d="M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z"
-fill="url(#hdrGeminiZ)"
-filter="url(#hdrGlow)"
-/>
-</svg>
-);
-
-// ============================================================
-// CONSTANTS & CONFIGURATION
-// ============================================================
-const DEFAULT_RULES = {
-"ED - DAVE": [],
-"ZAW REHAB COLD RUN": [
-"Brownes", "Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes", "Hilo Milk - Brownes",
-"Cheese - Cheddar PC", "Rice Pudding", "Custard PC", "Vanilla Yogurt PC", "Vanilla Yoghurt PC",
-"Strawberry Yogurt PC", "Strawberry Yoghurt PC", "Apple Juice PC", "Orange Juice PC", "Fresh Apple",
-"Apple Fresh", "Ice Coffee", "Iced Coffee", "Chocolate Chill", "Ham & Salad Sandwich", "Egg Mayo Sandwich"
-],
-"STEVE.M REHAB DRY RUN": [],
-"STEVE.M JUICE RUN": ["Apple Juice", "Orange Juice", "Diced Peaches", "Diced Pears"],
-"ZAW CHILLER RUN": [
-"Full Cream Milk", "Hilo Milk", "Hilo PC Milk", "Brownes", "Vanilla Yoghurt", "Strawberry Yoghurt",
-"Strawberry Yogurt", "Rice Pudding", "Custard", "Cheese - Cheddar", "Cheddar PC", "Sandwich",
-"Ham & Salad", "Egg Mayo"
-],
-"JAMES DRY RUN": [
-"White Sugar", "Coffee PC", "Decaf Coffee", "Sweetener", "Water Crackers", "Scotch Nice",
-"Soy Milk", "Rice Milk", "Lactose Free Milk", "Tea Bags Black", "Green Tea", "Tea Bags - Bushells",
-"Fruit Cake PC", "Milo"
-],
-"BEN FREEZER RUN": ["Ice Cream", "Butter PC", "Margarine PC"],
-"JAMES AFTERNOON RUN": ["Bananas fresh", "Fresh Bananas", "Apple Fresh", "Fresh Apple", "Carrot Cake"],
-"BEN PANTRY RUN": ["Thick", "Thickened", "Level 100", "Level 400", "Level 900"],
-"MEDI HOTEL - CHILLER": [],
-"MEDI HOTEL - DRY": []
-};
-
-const REHAB_WARDS = [
-"fshrehab2", "fshrehab1", "fshrehabground", "fshrehabg", "fshmentalhealtha",
-"rehab2", "rehab1", "rehabground", "rehabg", "mentalhealtha", "mentalhealth"
-];
-
-const MEDI_HOTEL_WARDS = ["m8", "m7", "m6", "m5"];
-
-const ICE_COFFEE_BEN_PANTRY_WARDS = [
-"7cd", "6cd", "5cd", "4cd", "3cd", "ccu", "icu", "7ab", "6ab", "5ab", "4ab", "3ab", "ssu"
-];
-
-const REHAB_FREEZER_KEYWORDS = [
-"butter pc", "margarine pc", "ice cream", "ice-cream", "carrot cake",
-"white bread", "wholemeal bread", "multigrain bread", "le moulin",
-"apple puree", "diced pears", "diced peaches", "riviana"
-];
-
-const AFTERNOON_KEYWORDS = ["apple fresh", "fresh apple", "bananas fresh", "fresh bananas", "banana", "carrot cake"];
-const BREAD_KEYWORDS = ["white bread", "wholemeal bread", "multigrain bread", "le moulin", "bread"];
-
-const JUICE_WARD_ORDER = [
-"Mental Health", "Mental Health A", "Rehab 2", "Rehab Ground", "Rehab G", "Rehab 1",
-"FSH SSU", "SSU", "FSH 3AB", "3AB", "FSH 4AB", "4AB", "FSH 5AB", "5AB", "FSH 6AB", "6AB",
-"FSH 7AB", "7AB", "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD",
-"FSH 3CD", "3CD", "FSH CCU", "CCU", "FSH ICU", "ICU", "FSH - M8", "M8", "FSH - M7", "M7",
-"FSH - M6", "M6", "FSH - M5", "M5"
-];
-
-const CHILLER_WARD_ORDER = [
-"Mental Health", "Rehab Ground", "Rehab G", "Rehab 2", "Rehab 1",
-"FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
-"FSH CCU", "CCU", "FSH ICU", "ICU", "FSH 7AB", "7AB", "FSH 6AB", "6AB", "FSH 5AB", "5AB",
-"FSH 4AB", "4AB", "FSH 3AB", "3AB", "FSH SSU", "SSU", "FSH - M8", "M8", "FSH - M7", "M7",
-"FSH - M6", "M6", "FSH - M5", "M5"
-];
-
-const ZAW_REHAB_WARD_ORDER = ["Rehab Ground", "FSH-Rehab Ground", "Rehab G", "FSH-Rehab G", "Rehab 2", "FSH-Rehab 2", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
-const STEVE_REHAB_WARD_ORDER = ["Rehab 2", "FSH-Rehab 2", "Rehab Ground", "FSH-Rehab Ground", "Rehab G", "FSH-Rehab G", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
-
-const STANDARD_RUN_WARD_ORDER = [
-"FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
-"FSH CCU", "CCU", "FSH ICU", "ICU", "FSH 7AB", "7AB", "FSH 6AB", "6AB", "FSH 5AB", "5AB",
-"FSH 4AB", "4AB", "FSH 3AB", "3AB", "FSH SSU", "SSU"
-];
-
-const AVAILABLE_CATEGORIES = [
-"ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "STEVE.M JUICE RUN",
-"ZAW CHILLER RUN", "JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN",
-"BEN PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
-];
-
-const EDITABLE_CATEGORIES = [
-"ZAW REHAB COLD RUN", "STEVE.M JUICE RUN", "ZAW CHILLER RUN",
-"JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN", "BEN PANTRY RUN"
-];
-
-const WARD_ONLY_CATEGORIES = {
-"ED - DAVE": "Assigned automatically — every item for the Emergency Department ward goes here.",
-"MEDI HOTEL - CHILLER": "Assigned automatically by ward (M5–M8) and item temperature zone.",
-"MEDI HOTEL - DRY": "Assigned automatically by ward (M5–M8) and item temperature zone.",
-"STEVE.M REHAB DRY RUN": "Automatic fallback for rehab-ward items that aren't on the Cold Run list."
-};
-
-const UNIT_ALIASES = {
-each: "Each", eaches: "Each", ea: "Each",
-litre: "Litre", litres: "Litre", liter: "Litre", liters: "Litre",
-kilogram: "Kilogram", kilograms: "Kilogram", kg: "Kilogram", kgs: "Kilogram"
-};
-
-const DATE_REGEX = /\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}/;
-
-// ============================================================
-// HELPERS
-// ============================================================
-const formatDateDDMMYY = (dateStr) => {
-if (!dateStr) return "";
-const parts = dateStr.match(/(\d{1,4})[\/\-.](\d{1,2})[\/\-.](\d{1,4})/);
-if (parts) {
-let day, month, year;
-if (parts[1].length === 4 || (parts[1].length === 2 && parseInt(parts[1], 10) > 31)) {
-year = parts[1].slice(-2).padStart(2, '0');
-month = parts[2].padStart(2, '0');
-day = parts[3].padStart(2, '0');
-} else {
-day = parts[1].padStart(2, '0');
-month = parts[2].padStart(2, '0');
-year = parts[3].slice(-2).padStart(2, '0');
-}
-return `${day}/${month}/${year}`;
-}
-return dateStr;
-};
-
-const normalizeLine = (str) => str.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-
-const UNIT_HINT_REGEX = /\((?:[^()]*\b(?:each|eaches|ea|litre|litres|liter|liters|kilogram|kilograms|kg|kgs)\b[^()]*)\)\s*$/i;
-const getItemDisplayKey = (item) => (
-UNIT_HINT_REGEX.test(item.name) ? item.name : `${item.name} (${item.unit})`
-);
-
-// ============================================================
-// UI COMPONENTS
-// ============================================================
-function CategoryLabel({ name, isSelected }) {
-const styles = {
-amberSelected: "bg-amber-400 text-slate-900 px-1 rounded font-extrabold",
-amber: "bg-amber-300 text-slate-900 px-1 rounded font-bold",
-blueSelected: "bg-blue-400 text-slate-900 px-1 rounded font-extrabold",
-blue: "bg-blue-300 text-slate-900 px-1 rounded font-bold",
-emeraldSelected: "bg-emerald-400 text-slate-900 px-1 rounded font-extrabold",
-emerald: "bg-emerald-300 text-slate-900 px-1 rounded font-bold",
-};
-const amber = isSelected ? styles.amberSelected : styles.amber;
-const blue = isSelected ? styles.blueSelected : styles.blue;
-const emerald = isSelected ? styles.emeraldSelected : styles.emerald;
-
-const labelMap = {
-"ED - DAVE": <>ED - <span className={amber}>DAVE</span></>,
-"ZAW REHAB COLD RUN": <>ZAW <span className={amber}>REHAB COLD RUN</span></>,
-"STEVE.M REHAB DRY RUN": <>STEVE.M <span className={amber}>REHAB DRY RUN</span></>,
-"STEVE.M JUICE RUN": <>STEVE.M <span className={amber}>JUICE RUN</span></>,
-"ZAW CHILLER RUN": <>ZAW <span className={amber}>CHILLER RUN</span></>,
-"JAMES DRY RUN": <>JAMES <span className={amber}>DRY RUN</span></>,
-"BEN FREEZER RUN": <>BEN <span className={amber}>FREEZER RUN</span></>,
-"JAMES AFTERNOON RUN": <>JAMES <span className={amber}>AFTERNOON RUN</span></>,
-"BEN PANTRY RUN": <>BEN <span className={amber}>PANTRY RUN</span></>,
-"MEDI HOTEL - CHILLER": <><span className={amber}>MEDI HOTEL</span> - <span className={blue}>CHILLER</span></>,
-"MEDI HOTEL - DRY": <><span className={amber}>MEDI HOTEL</span> - <span className={emerald}>DRY</span></>
-};
-
-return <span>{labelMap[name] || name}</span>;
-}
-
-function ProgressBar({ done, total, colorClass = "bg-emerald-500" }) {
-const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-return (
-<div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-<div
-className={`h-full ${colorClass} transition-all duration-300 ease-out`}
-style={{ width: `${pct}%` }}
-/>
-</div>
-);
-}
-
-function TriStateCheckbox({ checked, indeterminate, onChange, label }) {
-const ref = React.useRef(null);
-useEffect(() => {
-if (ref.current) ref.current.indeterminate = indeterminate;
-}, [indeterminate]);
-return (
-<input
-ref={ref}
-type="checkbox"
-checked={checked}
-onChange={onChange}
-aria-label={label}
-className="w-[18px] h-[18px] accent-emerald-600 rounded cursor-pointer flex-shrink-0"
-/>
-);
-}
-
-// ============================================================
-// MAIN APP
-// ============================================================
-function App() {
-const [rules, setRules] = useState(() => {
-try {
-const saved = localStorage.getItem('zstores_rules_v28');
-return saved ? JSON.parse(saved) : DEFAULT_RULES;
-} catch (e) {
-return DEFAULT_RULES;
-}
-});
-
-const [parsedData, setParsedData] = useState([]);
-const [unmatchedLines, setUnmatchedLines] = useState([]);
-const [deliveryDate, setDeliveryDate] = useState("");
-const [fileName, setFileName] = useState("");
-const [selectedRun, setSelectedRun] = useState("ED - DAVE");
-const [checkedItems, setCheckedItems] = useState({});
-const [summaryPicked, setSummaryPicked] = useState({});
-const [highlightedItemKey, setHighlightedItemKey] = useState(null);
-const [activeTab, setActiveTab] = useState("picker");
-const [newCategoryItem, setNewCategoryItem] = useState("");
-const [targetCategory, setTargetCategory] = useState(EDITABLE_CATEGORIES[0]);
-const [isLoading, setIsLoading] = useState(false);
-const [parseError, setParseError] = useState("");
-const [showReview, setShowReview] = useState(false);
-
-useEffect(() => {
-try {
-localStorage.setItem('zstores_rules_v28', JSON.stringify(rules));
-} catch (e) {}
-}, [rules]);
-
-useEffect(() => {
-setHighlightedItemKey(null);
-}, [selectedRun]);
-
-const getItemType = useCallback((itemName) => {
-const lower = itemName.toLowerCase();
-if (lower.includes("ice cream") || lower.includes("ice-cream") || lower.includes("bulla")) {
-return "FREEZER";
-}
-if (
-lower.includes("soy milk") || lower.includes("lactose free") || lower.includes("rice milk") ||
-lower.includes("vitasoy") || lower.includes("so good") || lower.includes("little things") ||
-lower.includes("sugar") || lower.includes("tea") || lower.includes("coffee") ||
-lower.includes("cracker") || lower.includes("biscuit")
-) {
-return "DRY";
-}
-const chillerKeywords = [
-...(rules["ZAW CHILLER RUN"] || []), "brownes", "milk", "yoghurt", "yogurt", "custard",
-"pudding", "juice", "butter", "margarine", "cheese", "sandwich", "ice coffee", "iced coffee", "chill"
-];
-return chillerKeywords.some(kw => lower.includes(kw.toLowerCase())) ? "CHILLER" : "DRY";
-}, [rules]);
-
-const getCategory = useCallback((itemName, wardName) => {
-const lowerItem = itemName.toLowerCase();
-const cleanWard = wardName.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-if (cleanWard.includes("emergency") || cleanWard.includes("ed")) return "ED - DAVE";
-
-if (MEDI_HOTEL_WARDS.some(mw => cleanWard.includes(mw))) {
-return getItemType(itemName) === "CHILLER" ? "MEDI HOTEL - CHILLER" : "MEDI HOTEL - DRY";
-}
-
-if (REHAB_WARDS.some(rw => cleanWard.includes(rw))) {
-if (REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw))) return "BEN FREEZER RUN";
-const zawKeywords = rules["ZAW REHAB COLD RUN"] || DEFAULT_RULES["ZAW REHAB COLD RUN"];
-return zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase())) ? "ZAW REHAB COLD RUN" : "STEVE.M REHAB DRY RUN";
-}
-
-if (lowerItem.includes("ice coffee - brownes pc 300 ml") || lowerItem.includes("ice coffee") || lowerItem.includes("iced coffee")) {
-if (ICE_COFFEE_BEN_PANTRY_WARDS.some(w => cleanWard.includes(w))) return "BEN PANTRY RUN";
-}
-
-if (BREAD_KEYWORDS.some(kw => lowerItem.includes(kw))) return null;
-if (lowerItem.includes("sandwich") || lowerItem.includes("ham & salad") || lowerItem.includes("egg mayo")) return "ZAW CHILLER RUN";
-if (AFTERNOON_KEYWORDS.some(kw => lowerItem.includes(kw))) return "JAMES AFTERNOON RUN";
-if (lowerItem.includes("thick") || lowerItem.includes("level")) return "BEN PANTRY RUN";
-
-for (const [category, keywords] of Object.entries(rules)) {
-if (["ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
-if (keywords.some(kw => lowerItem.includes(kw.toLowerCase()))) return category;
-}
-
-return "BEN PANTRY RUN";
-}, [rules, getItemType]);
-
-const parseDeliveryNoteLines = useCallback((lines) => {
-const orders = [];
-const unmatched = [];
-let currentWard = "Unknown Ward";
-let extractedDate = "";
-
-for (let i = 0; i < lines.length; i++) {
-const line = lines[i];
-const lowerLine = line.toLowerCase();
-
-if (!extractedDate && lowerLine.includes("for date")) {
-const dateMatch = line.match(DATE_REGEX);
-if (dateMatch) {
-extractedDate = formatDateDDMMYY(dateMatch[0]);
-} else if (i + 1 < lines.length) {
-const nextMatch = lines[i + 1].match(DATE_REGEX);
-if (nextMatch) extractedDate = formatDateDDMMYY(nextMatch[0]);
-}
-} else if (!extractedDate && lowerLine.includes("delivery note")) {
-const dateMatch = line.match(DATE_REGEX);
-if (dateMatch) extractedDate = formatDateDDMMYY(dateMatch[0]);
-}
-
-if (line.includes("FSH-") || line.toLowerCase().includes("rehab") || line.toLowerCase().includes("mental health") || line.toLowerCase().includes("emergency")) {
-if (!extractedDate) {
-const dateMatch = line.match(DATE_REGEX);
-if (dateMatch) extractedDate = formatDateDDMMYY(dateMatch[0]);
-}
-
-const match = line.match(/(FSH-[A-Za-z0-9\s\/]+?|Mental Health[A-Za-z0-9\s]*|Rehab\s+[A-Za-z0-9]+|Emergency)(?=\s+Ad|\s+\/|$)/i);
-currentWard = match ? match[1].trim() : line.trim();
-continue;
-}
-
-if (line.match(/^\d+$/) && i + 3 < lines.length) {
-const possibleQty = lines[i + 1];
-const possibleUnit = lines[i + 2];
-const possibleName = lines[i + 3];
-
-const qtyMatch = possibleQty.match(/^\d+(\.\d+)?$/);
-const nameLooksValid = possibleName && possibleName.length > 0 && !possibleName.match(/^\d+(\.\d+)?$/);
-const unitLooksValid = possibleUnit && possibleUnit.length > 0 && possibleUnit.length <= 20 && !possibleUnit.match(/^\d+(\.\d+)?$/);
-
-if (qtyMatch && nameLooksValid && unitLooksValid) {
-const canonicalUnit = UNIT_ALIASES[possibleUnit.trim().toLowerCase()];
-const resolvedUnit = canonicalUnit || possibleUnit.trim();
-const assignedCategory = getCategory(possibleName, currentWard);
-
-let unitConflictsWithName = false;
-const nameHint = possibleName.match(/\(([^()]*)\)\s*$/);
-if (nameHint) {
-const hintLower = nameHint[1].toLowerCase();
-const hintAliasKey = Object.keys(UNIT_ALIASES).find(alias => {
-const re = new RegExp(`\\b${alias}\\b`);
-return re.test(hintLower);
-});
-if (hintAliasKey && UNIT_ALIASES[hintAliasKey] !== resolvedUnit) {
-unitConflictsWithName = true;
-}
-}
-
-if (assignedCategory !== null) {
-orders.push({
-id: `${currentWard}-${possibleName}-${i}-${Math.random().toString(36).slice(2)}`,
-ward: currentWard,
-qty: parseFloat(possibleQty),
-unit: resolvedUnit,
-unitVerified: Boolean(canonicalUnit) && !unitConflictsWithName,
-name: possibleName,
-category: assignedCategory
-});
-}
-i += 3;
-continue;
-}
-
-if (!qtyMatch) {
-unmatched.push({ ward: currentWard, snippet: [line, possibleQty].filter(Boolean).join(' / ') });
-}
-}
-}
-
-return { orders, unmatched, extractedDate };
-}, [getCategory]);
-
-const handleFileUpload = async (event) => {
-const file = event.target.files[0];
-if (!file) return;
-
-setIsLoading(true);
-setParseError("");
-try {
-const arrayBuffer = await file.arrayBuffer();
-const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-let fullTextLines = [];
-let pagesFailed = 0;
-
-for (let i = 1; i <= pdf.numPages; i++) {
-try {
-const page = await pdf.getPage(i);
-const textContent = await page.getTextContent();
-const pageLines = textContent.items
-.map(item => normalizeLine(item.str || ''))
-.filter(Boolean);
-fullTextLines = [...fullTextLines, ...pageLines];
-} catch (pageErr) {
-pagesFailed += 1;
-}
-}
-
-if (fullTextLines.length === 0) {
-throw new Error("No readable text found in this PDF. It may be a scanned image rather than a text-based delivery note.");
-}
-
-const { orders, unmatched, extractedDate } = parseDeliveryNoteLines(fullTextLines);
-
-if (orders.length === 0) {
-setParseError("The PDF loaded, but no order lines were recognized. The delivery note format may have changed — check the Review panel and the original PDF.");
-} else if (pagesFailed > 0) {
-setParseError(`Loaded with ${pagesFailed} page(s) that couldn't be read — some items may be missing.`);
-}
-
-setParsedData(orders);
-setUnmatchedLines(unmatched);
-setDeliveryDate(extractedDate);
-setFileName(file.name);
-setCheckedItems({});
-setSummaryPicked({});
-setHighlightedItemKey(null);
-setShowReview(false);
-} catch (err) {
-setParseError("Couldn't read this PDF: " + err.message);
-setParsedData([]);
-setUnmatchedLines([]);
-} finally {
-setIsLoading(false);
-event.target.value = "";
-}
-};
-
-const toggleCheck = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
-const toggleSummaryHighlight = (itemKey) => setHighlightedItemKey(prev => (prev === itemKey ? null : itemKey));
-
-const currentRunItems = useMemo(() => parsedData.filter(item => item.category === selectedRun), [parsedData, selectedRun]);
-
-const toggleSummaryPick = (itemLabel) => {
-const key = `${selectedRun}|${itemLabel}`;
-setSummaryPicked(prev => ({ ...prev, [key]: !prev[key] }));
-};
-
-const runCheckedCount = useMemo(
-() => currentRunItems.filter(item => checkedItems[item.id]).length,
-[currentRunItems, checkedItems]
-);
-
-const resetRunChecks = () => {
-setCheckedItems(prev => {
-const next = { ...prev };
-currentRunItems.forEach(item => { delete next[item.id]; });
-return next;
-});
-setSummaryPicked(prev => {
-const next = { ...prev };
-Object.keys(itemSummary).forEach(label => { delete next[`${selectedRun}|${label}`]; });
-return next;
-});
-};
-
-const itemSummary = useMemo(() => {
-const totals = {};
-currentRunItems.forEach(item => {
-const key = getItemDisplayKey(item);
-totals[key] = (totals[key] || 0) + item.qty;
-});
-return totals;
-}, [currentRunItems]);
-
-const itemPickStatus = useMemo(() => {
-const status = {};
-currentRunItems.forEach(item => {
-const key = getItemDisplayKey(item);
-if (!status[key]) status[key] = { total: 0, checkedCount: 0 };
-status[key].total += 1;
-if (checkedItems[item.id]) status[key].checkedCount += 1;
-});
-return status;
-}, [currentRunItems, checkedItems]);
-
-useEffect(() => {
-if (!highlightedItemKey) return;
-const status = itemPickStatus[highlightedItemKey];
-if (status && status.total > 0 && status.checkedCount === status.total) {
-setHighlightedItemKey(null);
-}
-}, [itemPickStatus, highlightedItemKey]);
-
-const sortWardsByOrder = (grouped, orderArray) => {
-const sortedGrouped = {};
-orderArray.forEach(targetWard => {
-const foundKey = Object.keys(grouped).find(
-w => w.toLowerCase().replace(/[^a-z0-9]/g, '') === targetWard.toLowerCase().replace(/[^a-z0-9]/g, '')
-);
-if (foundKey && !sortedGrouped[foundKey]) sortedGrouped[foundKey] = grouped[foundKey];
-});
-Object.keys(grouped).forEach(wardKey => {
-if (!sortedGrouped[wardKey]) sortedGrouped[wardKey] = grouped[wardKey];
-});
-return sortedGrouped;
-};
-
-const itemsByWard = useMemo(() => {
-const grouped = {};
-currentRunItems.forEach(item => {
-if (!grouped[item.ward]) grouped[item.ward] = [];
-grouped[item.ward].push(item);
-});
-
-if (selectedRun === "ED - DAVE") {
-const typePriority = { "FREEZER": 0, "CHILLER": 1, "DRY": 2 };
-Object.keys(grouped).forEach(wardKey => {
-grouped[wardKey].sort((a, b) => typePriority[getItemType(a.name)] - typePriority[getItemType(b.name)]);
-});
-}
-
-const runOrders = {
-"ZAW CHILLER RUN": CHILLER_WARD_ORDER,
-"STEVE.M JUICE RUN": JUICE_WARD_ORDER,
-"ZAW REHAB COLD RUN": ZAW_REHAB_WARD_ORDER,
-"STEVE.M REHAB DRY RUN": STEVE_REHAB_WARD_ORDER
-};
-
-if (runOrders[selectedRun]) return sortWardsByOrder(grouped, runOrders[selectedRun]);
-if (["JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN", "BEN PANTRY RUN"].includes(selectedRun)) {
-return sortWardsByOrder(grouped, STANDARD_RUN_WARD_ORDER);
-}
-
-return grouped;
-}, [currentRunItems, selectedRun, getItemType]);
-
-const handleAddItemRule = (e) => {
-e.preventDefault();
-if (!newCategoryItem.trim()) return;
-
-setRules(prev => ({
-...prev,
-[targetCategory]: [...(prev[targetCategory] || []), newCategoryItem.trim()]
-}));
-setNewCategoryItem("");
-};
-
-const handleRemoveRule = (category, keyword) => {
-setRules(prev => ({
-...prev,
-[category]: prev[category].filter(k => k !== keyword)
-}));
-};
-
-return (
-<div className="max-w-6xl mx-auto px-0 sm:px-4 md:px-6 p-4 md:p-6 pb-24 md:pb-6">
-
-{/* Print-only header */}
-<div className="print-header items-center justify-between border-b-2 border-black pb-2 mb-4">
-<div className="font-display font-extrabold text-lg">Zstores — <CategoryLabel name={selectedRun} isSelected={false} /></div>
-<div className="text-sm">{deliveryDate ? `Delivery date: ${deliveryDate}` : ''}</div>
-</div>
-
-{/* HEADER */}
-<header className="no-print bg-ink text-white p-4 rounded-none sm:rounded-2xl shadow-lg mb-6 relative overflow-hidden">
-<div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 via-fuchsia-500 to-amber-400" />
-<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-<div className="flex items-center gap-3">
-<GeminiZLogo />
-<div>
-<h1 className="font-display text-2xl font-extrabold tracking-tight text-white">
-Zstores
-</h1>
-<p className="text-slate-400 text-xs">Hospital store category run dispatch</p>
-</div>
-</div>
-
-<nav className="flex items-center gap-2" role="tablist" aria-label="Sections">
-<button
-role="tab"
-aria-selected={activeTab === 'picker'}
-onClick={() => setActiveTab("picker")}
-className={`px-4 py-2 text-sm font-semibold rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${activeTab === 'picker' ? 'bg-emerald-500 text-slate-950' : 'bg-white/10 text-slate-200 hover:bg-white/20'}`}
->
-Run picker
-</button>
-<button
-role="tab"
-aria-selected={activeTab === 'settings'}
-onClick={() => setActiveTab("settings")}
-className={`px-4 py-2 text-sm font-semibold rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${activeTab === 'settings' ? 'bg-emerald-500 text-slate-950' : 'bg-white/10 text-slate-200 hover:bg-white/20'}`}
->
-Item rules
-</button>
-</nav>
-</div>
-</header>
-
-{activeTab === "picker" ? (
-<div>
-{/* UPLOAD & PRINT CONTROLS */}
-<div className="no-print bg-white p-4 rounded-none sm:rounded-xl shadow-sm mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-<div className="w-full md:w-auto">
-<label htmlFor="pdf-upload" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
-Upload today's delivery note (PDF)
-</label>
-<input
-id="pdf-upload"
-type="file"
-accept="application/pdf"
-onChange={handleFileUpload}
-className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded"
-/>
-{fileName && <p className="text-[11px] text-slate-400 mt-1 truncate max-w-xs">{fileName}</p>}
-</div>
-
-{parsedData.length > 0 && (
-<div className="w-full md:w-auto flex gap-2">
-{unmatchedLines.length > 0 && (
-<button
-onClick={() => setShowReview(v => !v)}
-className="px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-medium rounded-lg border border-amber-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
->
-{unmatchedLines.length} to review
-</button>
-)}
-<button
-onClick={() => window.print()}
-className="flex-1 md:flex-none px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
->
-Print this run
-</button>
-</div>
-)}
-</div>
-
-{parseError && (
-<div className="no-print bg-amber-50 border border-amber-300 text-amber-900 text-sm px-4 py-3 rounded-none sm:rounded-xl mb-4 flex items-start justify-between gap-3">
-<span>{parseError}</span>
-<button onClick={() => setParseError("")} aria-label="Dismiss" className="font-bold text-amber-700 hover:text-amber-900">×</button>
-</div>
-)}
-
-{showReview && unmatchedLines.length > 0 && (
-<div className="no-print bg-white border border-amber-300 rounded-none sm:rounded-xl p-4 mb-4">
-<h3 className="text-sm font-bold text-amber-900 mb-2">Lines that need a manual look</h3>
-<p className="text-xs text-slate-500 mb-3">
-These looked like the start of an order row but didn't fully match the expected pattern, so they weren't auto-sorted. Check them against the original PDF.
-</p>
-<ul className="space-y-1 max-h-56 overflow-y-auto">
-{unmatchedLines.map((u, idx) => (
-<li key={idx} className="text-xs bg-amber-50 border border-amber-200 rounded px-2 py-1.5 flex justify-between gap-2">
-<span className="font-medium text-slate-700">{u.ward}</span>
-<span className="text-slate-500 truncate">{u.snippet}</span>
-</li>
-))}
-</ul>
-</div>
-)}
-
-{isLoading && (
-<div className="bg-white p-8 rounded-none sm:rounded-xl shadow-sm text-center font-medium text-slate-600 zs-enter">
-Reading delivery note…
-</div>
-)}
-
-{/* RUN CATEGORY SELECTOR */}
-{parsedData.length > 0 && (
-<div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 px-2 sm:px-0 mb-6">
-{AVAILABLE_CATEGORIES.map(category => {
-const items = parsedData.filter(i => i.category === category);
-const count = items.length;
-const doneCount = items.filter(i => checkedItems[i.id]).length;
-const isSelected = selectedRun === category;
-return (
-<button
-key={category}
-onClick={() => setSelectedRun(category)}
-aria-pressed={isSelected}
-style={{ width: '100%', boxSizing: 'border-box' }}
-className={`p-3 rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
-isSelected
-? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
-: 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
-}`}
->
-<div className="text-xs font-bold tracking-wide opacity-90">
-<CategoryLabel name={category} isSelected={isSelected} />
-</div>
-<div className="text-xl font-bold mt-1 tabular-nums">
-{count} <span className="text-xs font-normal">items</span>
-</div>
-{count > 0 && (
-<div className="mt-2">
-<ProgressBar done={doneCount} total={count} colorClass={isSelected ? "bg-white" : "bg-emerald-500"} />
-</div>
-)}
-</button>
-);
-})}
-</div>
-)}
-
-{/* DELIVERY RUN DETAILS */}
-{parsedData.length > 0 ? (
-<div>
-<div className="mb-4 px-3 sm:px-0 flex flex-wrap justify-between items-end border-b pb-3 gap-2">
-<div>
-<h2 className="text-xl font-bold text-slate-800">
-<CategoryLabel name={selectedRun} isSelected={false} /> delivery list
-</h2>
-<p className="text-xs text-slate-500">
-{selectedRun === "ED - DAVE"
-? "Sorted: freezer (top) → chiller (middle) → dry (bottom)"
-: "Sorted in fixed route print sequence"}
-{WARD_ONLY_CATEGORIES[selectedRun] ? ` · ${WARD_ONLY_CATEGORIES[selectedRun]}` : ''}
-</p>
-</div>
-<div className="no-print flex items-center gap-2 flex-wrap">
-{deliveryDate && (
-<span className="text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-200 px-3 py-1 rounded-full">
-Date: {deliveryDate}
-</span>
-)}
-<span className="text-xs font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full tabular-nums">
-{runCheckedCount}/{currentRunItems.length} picked
-</span>
-</div>
-</div>
-
-{/* PICK LIST SUMMARY — iOS EDGE-TO-EDGE FITTED CARD */}
-{Object.keys(itemSummary).length > 0 && (
-<div className="card bg-emerald-50 border-y sm:border border-emerald-200 rounded-none sm:rounded-xl p-4 mb-6">
-<div className="flex justify-between items-center mb-2 border-b border-emerald-200 pb-1 flex-wrap gap-1">
-<h3 className="text-sm font-bold text-emerald-900 tracking-wide">
-Catering store pick list summary
-</h3>
-<span className="text-[11px] text-emerald-700 font-medium">
-Tick to mark picked from the store · tap the row to highlight it below
-</span>
-</div>
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-{Object.entries(itemSummary).map(([itemLabel, totalQty]) => {
-const isSelected = highlightedItemKey === itemLabel;
-const wardStatus = itemPickStatus[itemLabel];
-const wardPartiallyDone = Boolean(wardStatus) && wardStatus.checkedCount > 0 && wardStatus.checkedCount < wardStatus.total;
-const isTicked = Boolean(summaryPicked[`${selectedRun}|${itemLabel}`]);
-return (
-<div
-key={itemLabel}
-style={{
-width: '100%', boxSizing: 'border-box', display: 'grid',
-gridTemplateColumns: 'auto minmax(0, 1fr)', alignItems: 'stretch'
-}}
-className={`print-row rounded border overflow-hidden transition ${
-isTicked
-? 'bg-slate-50 border-slate-200 opacity-70'
-: isSelected
-? 'bg-amber-300 border-amber-500 ring-2 ring-amber-400 shadow-sm'
-: 'bg-white border-emerald-200'
-}`}
->
-<label
-className="flex items-center pl-2 pr-1.5 cursor-pointer"
-title="Mark this item as picked from the store (doesn't affect ward rows below)"
->
-<TriStateCheckbox
-checked={isTicked}
-indeterminate={false}
-onChange={() => toggleSummaryPick(itemLabel)}
-label={`Mark ${itemLabel} as picked from the store`}
-/>
-</label>
-<button
-onClick={() => toggleSummaryHighlight(itemLabel)}
-aria-pressed={isSelected}
-style={{
-width: '100%', boxSizing: 'border-box', display: 'grid',
-gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center'
-}}
-className={`py-2 pr-3 pl-1 text-sm font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
-isTicked
-? 'text-slate-500'
-: isSelected
-? 'text-slate-900 font-bold'
-: 'text-slate-800 hover:bg-emerald-100'
-}`}
->
-<span style={{ minWidth: 0 }}>
-<span className={`block truncate ${isTicked ? 'line-through' : ''}`}>{itemLabel}</span>
-{isSelected && wardStatus && wardStatus.total > 1 && wardStatus.checkedCount < wardStatus.total && (
-<span className="block text-[10px] font-medium text-amber-800 tabular-nums">
-{wardStatus.checkedCount}/{wardStatus.total} ward lines picked — stays lit till 100%
-</span>
-)}
-{wardPartiallyDone && !isSelected && (
-<span className="block text-[10px] font-medium text-slate-500 tabular-nums">
-{wardStatus.checkedCount}/{wardStatus.total} ward lines picked
-</span>
-)}
-</span>
-<span className={`px-2 py-0.5 rounded font-bold ml-2 tabular-nums ${isTicked ? 'bg-slate-300 text-slate-700' : isSelected ? 'bg-slate-900 text-white' : 'bg-emerald-600 text-white'}`}>
-{totalQty}
-</span>
-</button>
-</div>
-);
-})}
-</div>
-</div>
-)}
-
-{/* ITEM LIST BY WARD */}
-{Object.keys(itemsByWard).length > 0 && (
-<div className="no-print flex items-center justify-between mb-3 px-3 sm:px-0">
-<h3 className="text-sm font-bold text-slate-600 tracking-wide">Ward delivery lists</h3>
-{runCheckedCount > 0 && (
-<button
-onClick={resetRunChecks}
-className="text-xs font-medium text-slate-500 hover:text-slate-800 underline underline-offset-2"
->
-Reset checks
-</button>
-)}
-</div>
-)}
-{Object.keys(itemsByWard).length === 0 ? (
-<div className="bg-white p-8 rounded-none sm:rounded-xl shadow-sm text-center text-slate-500">
-No items assigned to <CategoryLabel name={selectedRun} isSelected={false} /> from today's delivery note.
-</div>
-) : (
-<div className="grid gap-4">
-{Object.entries(itemsByWard).map(([ward, items]) => {
-const wardDone = items.filter(i => checkedItems[i.id]).length;
-return (
-/* WARD CARD — iOS EDGE-TO-EDGE FITTED CARD */
-<div key={ward} className="card bg-white rounded-none sm:rounded-xl shadow-sm p-4 border-y sm:border border-slate-200">
-<div className="print-keep-with-next border-b pb-2 mb-3">
-<div className="flex justify-between items-center">
-<span className="text-lg font-bold text-slate-900">{ward}</span>
-<span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full tabular-nums no-print">
-{wardDone}/{items.length}
-</span>
-</div>
-<div className="no-print mt-2">
-<ProgressBar done={wardDone} total={items.length} />
-</div>
-</div>
-
-<div className="divide-y divide-slate-100">
-{items.map(item => {
-const isChecked = !!checkedItems[item.id];
-const itemType = getItemType(item.name);
-const itemKey = getItemDisplayKey(item);
-const isHighlighted = highlightedItemKey === itemKey;
-
-const badgeStyles = {
-"FREEZER": "bg-cyan-100 text-cyan-900 border border-cyan-200",
-"CHILLER": "bg-blue-100 text-blue-900 border border-blue-200",
-"DRY": "bg-amber-100 text-amber-900 border border-amber-200"
-};
-
-let rowClass = 'hover:bg-slate-50';
-if (isHighlighted) {
-rowClass = isChecked
-? 'bg-amber-50 text-amber-800 border-l-4 border-amber-300'
-: 'bg-amber-100 text-amber-950 font-bold border-l-4 border-amber-500 shadow-sm';
-} else if (isChecked) {
-rowClass = 'bg-slate-50 opacity-60';
-}
-
-let nameClass = 'text-slate-800 font-medium';
-if (isHighlighted) {
-nameClass = isChecked
-? 'line-through text-amber-700 font-medium'
-: 'text-amber-950 font-bold text-base';
-} else if (isChecked) {
-nameClass = 'line-through text-slate-400 font-normal';
-}
-
-return (
-<label
-key={item.id}
-className={`print-row py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${rowClass}`}
->
-<div className="flex items-center gap-3 min-w-0">
-<span className="print-checkbox" aria-hidden="true"></span>
-<input
-type="checkbox"
-checked={isChecked}
-onChange={() => toggleCheck(item.id)}
-className="w-5 h-5 accent-emerald-600 rounded cursor-pointer no-print flex-shrink-0"
-/>
-<span className={`text-sm truncate min-w-0 ${nameClass}`}>
-{item.name}
-</span>
-{!item.unitVerified && (
-<span className="no-print text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0" title="Unit wasn't a recognized label, or disagrees with the unit named in the item itself — double check it.">
-verify unit
-</span>
-)}
-{selectedRun === "ED - DAVE" && (
-<span className={`text-[10px] font-bold px-2 py-0.5 rounded flex-shrink-0 ${badgeStyles[itemType]}`}>
-{itemType}
-</span>
-)}
-</div>
-
-<div className={`text-sm font-bold px-3 py-1 rounded-md tabular-nums flex-shrink-0 ${isHighlighted ? (isChecked ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-300 text-slate-900 border border-amber-400') : 'bg-slate-100 text-slate-900'}`}>
-{item.qty} <span className="text-xs font-normal text-slate-600">{item.unit}</span>
-</div>
-</label>
-);
-})}
-</div>
-</div>
-);})}
-</div>
-)}
-</div>
-) : (
-!isLoading && (
-<div className="bg-white p-12 rounded-none sm:rounded-xl shadow-sm text-center zs-enter">
-<div className="flex justify-center mb-3"><GeminiZLogo className="w-12 h-12 opacity-80" /></div>
-<h3 className="text-lg font-bold text-slate-800">No delivery note loaded yet</h3>
-<p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
-Upload today's PDF delivery note above to split it into the store's category runs.
-</p>
-</div>
-)
-)}
-</div>
-) : (
-/* RULES SETTINGS TAB */
-<div className="no-print bg-white rounded-none sm:rounded-xl shadow-sm p-6">
-<h2 className="text-xl font-bold text-slate-800 mb-2">Category rule settings</h2>
-<p className="text-xs text-slate-500 mb-6">
-Manage keywords used to automatically route incoming PDF items into the category runs.
-Runs assigned purely by ward (ED - DAVE, Medi Hotel, and the rehab dry fallback) aren't listed
-as targets below, since keywords have no effect on them.
-</p>
-
-<form onSubmit={handleAddItemRule} className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8 flex flex-col md:flex-row gap-3 items-end">
-<div className="flex-1 w-full">
-<label htmlFor="new-keyword" className="block text-xs font-semibold text-slate-600 mb-1">Item name / keyword</label>
-<input
-id="new-keyword"
-type="text"
-value={newCategoryItem}
-onChange={(e) => setNewCategoryItem(e.target.value)}
-placeholder="e.g., Strawberry Yoghurt"
-className="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
-/>
-</div>
-
-<div className="w-full md:w-56">
-<label htmlFor="target-category" className="block text-xs font-semibold text-slate-600 mb-1">Assign to category run</label>
-<select
-id="target-category"
-value={targetCategory}
-onChange={(e) => setTargetCategory(e.target.value)}
-className="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 bg-white"
->
-{EDITABLE_CATEGORIES.map(cat => (
-<option key={cat} value={cat}>{cat}</option>
-))}
-</select>
-</div>
-
-<button
-type="submit"
-className="w-full md:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
->
-Add item rule
-</button>
-</form>
-
-<div className="grid md:grid-cols-2 gap-6">
-{Object.entries(rules).map(([category, keywords]) => {
-const isWardOnly = Boolean(WARD_ONLY_CATEGORIES[category]);
-return (
-<div key={category} className={`border rounded-xl p-4 ${isWardOnly ? 'border-slate-100 bg-slate-50' : 'border-slate-200'}`}>
-<h3 className="font-bold text-slate-800 border-b pb-2 mb-3 flex justify-between items-center gap-2">
-<CategoryLabel name={category} isSelected={false} />
-<span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 flex-shrink-0">
-{isWardOnly ? 'ward-based' : `${keywords.length} keywords`}
-</span>
-</h3>
-
-{isWardOnly ? (
-<p className="text-xs text-slate-400 italic">{WARD_ONLY_CATEGORIES[category]}</p>
-) : (
-<div className="flex flex-wrap gap-1.5">
-{keywords.length === 0 ? (
-<span className="text-xs text-slate-400 italic">No keywords yet — nothing routes here automatically until you add one.</span>
-) : (
-keywords.map((kw, idx) => (
-<span key={idx} className="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md flex items-center gap-2 border border-slate-200">
-{kw}
-<button
-onClick={() => handleRemoveRule(category, kw)}
-aria-label={`Remove ${kw}`}
-className="text-slate-400 hover:text-red-500 font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 rounded"
->
-×
-</button>
-</span>
-))
-)}
-</div>
-)}
-</div>
-);})}
-</div>
-</div>
-)}
-
-{/* MOBILE STICKY ACTION BAR */}
-{parsedData.length > 0 && activeTab === 'picker' && (
-<div className="no-print md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 p-3 flex items-center justify-between gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
-<div className="text-xs font-semibold text-slate-600 tabular-nums">
-{runCheckedCount}/{currentRunItems.length} picked
-</div>
-<button
-onClick={() => window.print()}
-className="px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-lg"
->
-Print run
-</button>
-</div>
-)}
-</div>
-);
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
-</script>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, useMemo, useCallback } = React;
+
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    // ============================================================
+    // LOGO
+    // ============================================================
+    const GeminiZLogo = ({ className = "w-9 h-9" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" className={`${className} flex-shrink-0`}>
+        <defs>
+          <linearGradient id="hdrGeminiZ" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1A73E8" />
+            <stop offset="35%" stopColor="#8E24AA" />
+            <stop offset="70%" stopColor="#E91E63" />
+            <stop offset="100%" stopColor="#FFB300" />
+          </linearGradient>
+          <radialGradient id="hdrBlueGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#2563EB" stopOpacity="0.4" />
+            <stop offset="60%" stopColor="#1E3A8A" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#0F172A" stopOpacity="0" />
+          </radialGradient>
+          <filter id="hdrGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="14" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+        <rect width="500" height="500" rx="100" fill="#0B1329" />
+        <circle cx="250" cy="250" r="220" fill="url(#hdrBlueGlow)" />
+        <path
+          d="M 140 130 H 360 C 375 130, 385 142, 380 156 L 190 350 H 360 C 375 350, 385 362, 380 376 C 376 385, 368 390, 360 390 H 140 C 125 390, 115 378, 120 364 L 310 170 H 140 C 125 170, 115 158, 120 144 C 124 135, 132 130, 140 130 Z"
+          fill="url(#hdrGeminiZ)"
+          filter="url(#hdrGlow)"
+        />
+      </svg>
+    );
+
+    // ============================================================
+    // CONSTANTS & CONFIGURATION
+    // These keyword lists, ward lists, and sort orders encode the
+    // real routing rules for this store. Do not change their
+    // *contents* casually — they are what makes items land in the
+    // correct physical run.
+    // ============================================================
+    const DEFAULT_RULES = {
+      "ED - DAVE": [],
+      "ZAW REHAB COLD RUN": [
+        "Brownes", "Full Cream Milk PC", "Hilo Milk PC", "Full Cream Milk - Brownes", "Hilo Milk - Brownes",
+        "Cheese - Cheddar PC", "Rice Pudding", "Custard PC", "Vanilla Yogurt PC", "Vanilla Yoghurt PC",
+        "Strawberry Yogurt PC", "Strawberry Yoghurt PC", "Apple Juice PC", "Orange Juice PC", "Fresh Apple",
+        "Apple Fresh", "Ice Coffee", "Iced Coffee", "Chocolate Chill", "Ham & Salad Sandwich", "Egg Mayo Sandwich"
+      ],
+      "STEVE.M REHAB DRY RUN": [],
+      "STEVE.M JUICE RUN": ["Apple Juice", "Orange Juice", "Diced Peaches", "Diced Pears"],
+      "ZAW CHILLER RUN": [
+        "Full Cream Milk", "Hilo Milk", "Hilo PC Milk", "Brownes", "Vanilla Yoghurt", "Strawberry Yoghurt",
+        "Strawberry Yogurt", "Rice Pudding", "Custard", "Cheese - Cheddar", "Cheddar PC", "Sandwich",
+        "Ham & Salad", "Egg Mayo"
+      ],
+      "JAMES DRY RUN": [
+        "White Sugar", "Coffee PC", "Decaf Coffee", "Sweetener", "Water Crackers", "Scotch Nice",
+        "Soy Milk", "Rice Milk", "Lactose Free Milk", "Tea Bags Black", "Green Tea", "Tea Bags - Bushells",
+        "Fruit Cake PC", "Milo"
+      ],
+      "BEN FREEZER RUN": ["Ice Cream", "Butter PC", "Margarine PC"],
+      "JAMES AFTERNOON RUN": ["Bananas fresh", "Fresh Bananas", "Apple Fresh", "Fresh Apple", "Carrot Cake"],
+      "BEN PANTRY RUN": ["Thick", "Thickened", "Level 100", "Level 400", "Level 900"],
+      "MEDI HOTEL - CHILLER": [],
+      "MEDI HOTEL - DRY": []
+    };
+
+    const REHAB_WARDS = [
+      "fshrehab2", "fshrehab1", "fshrehabground", "fshrehabg", "fshmentalhealtha",
+      "rehab2", "rehab1", "rehabground", "rehabg", "mentalhealtha", "mentalhealth"
+    ];
+
+    const MEDI_HOTEL_WARDS = ["m8", "m7", "m6", "m5"];
+
+    const ICE_COFFEE_BEN_PANTRY_WARDS = [
+      "7cd", "6cd", "5cd", "4cd", "3cd", "ccu", "icu", "7ab", "6ab", "5ab", "4ab", "3ab", "ssu"
+    ];
+
+    const REHAB_FREEZER_KEYWORDS = [
+      "butter pc", "margarine pc", "ice cream", "ice-cream", "carrot cake",
+      "white bread", "wholemeal bread", "multigrain bread", "le moulin",
+      "apple puree", "diced pears", "diced peaches", "riviana"
+    ];
+
+    const AFTERNOON_KEYWORDS = ["apple fresh", "fresh apple", "bananas fresh", "fresh bananas", "banana", "carrot cake"];
+    const BREAD_KEYWORDS = ["white bread", "wholemeal bread", "multigrain bread", "le moulin", "bread"];
+
+    const JUICE_WARD_ORDER = [
+      "Mental Health", "Mental Health A", "Rehab 2", "Rehab Ground", "Rehab G", "Rehab 1",
+      "FSH SSU", "SSU", "FSH 3AB", "3AB", "FSH 4AB", "4AB", "FSH 5AB", "5AB", "FSH 6AB", "6AB",
+      "FSH 7AB", "7AB", "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD",
+      "FSH 3CD", "3CD", "FSH CCU", "CCU", "FSH ICU", "ICU", "FSH - M8", "M8", "FSH - M7", "M7",
+      "FSH - M6", "M6", "FSH - M5", "M5"
+    ];
+
+    const CHILLER_WARD_ORDER = [
+      "Mental Health", "Rehab Ground", "Rehab G", "Rehab 2", "Rehab 1",
+      "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
+      "FSH CCU", "CCU", "FSH ICU", "ICU", "FSH 7AB", "7AB", "FSH 6AB", "6AB", "FSH 5AB", "5AB",
+      "FSH 4AB", "4AB", "FSH 3AB", "3AB", "FSH SSU", "SSU", "FSH - M8", "M8", "FSH - M7", "M7",
+      "FSH - M6", "M6", "FSH - M5", "M5"
+    ];
+
+    const ZAW_REHAB_WARD_ORDER = ["Rehab Ground", "FSH-Rehab Ground", "Rehab G", "FSH-Rehab G", "Rehab 2", "FSH-Rehab 2", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
+    const STEVE_REHAB_WARD_ORDER = ["Rehab 2", "FSH-Rehab 2", "Rehab Ground", "FSH-Rehab Ground", "Rehab G", "FSH-Rehab G", "Rehab 1", "FSH-Rehab 1", "Mental Health A", "FSH-Mental Health A"];
+
+    const STANDARD_RUN_WARD_ORDER = [
+      "FSH 7CD", "7CD", "FSH 6CD", "6CD", "FSH 5CD", "5CD", "FSH 4CD", "4CD", "FSH 3CD", "3CD",
+      "FSH CCU", "CCU", "FSH ICU", "ICU", "FSH 7AB", "7AB", "FSH 6AB", "6AB", "FSH 5AB", "5AB",
+      "FSH 4AB", "4AB", "FSH 3AB", "3AB", "FSH SSU", "SSU"
+    ];
+
+    const AVAILABLE_CATEGORIES = [
+      "ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "STEVE.M JUICE RUN",
+      "ZAW CHILLER RUN", "JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN",
+      "BEN PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
+    ];
+
+    // Categories whose keyword list is actually consulted by getCategory().
+    // ED - DAVE / MEDI HOTEL (both) are routed purely by ward name, and
+    // STEVE.M REHAB DRY RUN is the automatic rehab fallback — editing their
+    // keywords in Settings previously had no effect on sorting. That's a
+    // real bug: it let staff "add a rule" that silently did nothing.
+    const EDITABLE_CATEGORIES = [
+      "ZAW REHAB COLD RUN", "STEVE.M JUICE RUN", "ZAW CHILLER RUN",
+      "JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN", "BEN PANTRY RUN"
+    ];
+    const WARD_ONLY_CATEGORIES = {
+      "ED - DAVE": "Assigned automatically — every item for the Emergency Department ward goes here.",
+      "MEDI HOTEL - CHILLER": "Assigned automatically by ward (M5–M8) and item temperature zone.",
+      "MEDI HOTEL - DRY": "Assigned automatically by ward (M5–M8) and item temperature zone.",
+      "STEVE.M REHAB DRY RUN": "Automatic fallback for rehab-ward items that aren't on the Cold Run list."
+    };
+
+    // Known unit labels as they appear on this store's delivery notes.
+    // Matching is case-insensitive and tolerant of plurals, since PDF
+    // text extraction isn't always consistently cased.
+    const UNIT_ALIASES = {
+      each: "Each", eaches: "Each", ea: "Each",
+      litre: "Litre", litres: "Litre", liter: "Litre", liters: "Litre",
+      kilogram: "Kilogram", kilograms: "Kilogram", kg: "Kilogram", kgs: "Kilogram"
+    };
+
+    const DATE_REGEX = /\d{1,4}[\/\-.]\d{1,2}[\/\-.]\d{1,4}/;
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    const formatDateDDMMYY = (dateStr) => {
+      if (!dateStr) return "";
+      const parts = dateStr.match(/(\d{1,4})[\/\-.](\d{1,2})[\/\-.](\d{1,4})/);
+      if (parts) {
+        let day, month, year;
+        if (parts[1].length === 4 || (parts[1].length === 2 && parseInt(parts[1], 10) > 31)) {
+          year = parts[1].slice(-2).padStart(2, '0');
+          month = parts[2].padStart(2, '0');
+          day = parts[3].padStart(2, '0');
+        } else {
+          day = parts[1].padStart(2, '0');
+          month = parts[2].padStart(2, '0');
+          year = parts[3].slice(-2).padStart(2, '0');
+        }
+        return `${day}/${month}/${year}`;
+      }
+      return dateStr;
+    };
+
+    const normalizeLine = (str) => str.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // Many item names already end with their own pack-size/unit hint,
+    // e.g. "Apple Puree PC - Riviana (each)" or "Full Cream Milk -
+    // Brownes (2 Litre)". Appending "(Each)" / "(Litre)" again for the
+    // pick-list label then reads as a duplicate, e.g. "(each) (Each)".
+    // Only append the parsed unit when the name doesn't already carry
+    // a recognizable unit hint of its own.
+    const UNIT_HINT_REGEX = /\((?:[^()]*\b(?:each|eaches|ea|litre|litres|liter|liters|kilogram|kilograms|kg|kgs)\b[^()]*)\)\s*$/i;
+    const getItemDisplayKey = (item) => (
+      UNIT_HINT_REGEX.test(item.name) ? item.name : `${item.name} (${item.unit})`
+    );
+
+    // ============================================================
+    // SMALL UI PRIMITIVES
+    // ============================================================
+    const RUN_ACCENTS = {
+      "ED - DAVE": "amber",
+      "ZAW REHAB COLD RUN": "amber",
+      "STEVE.M REHAB DRY RUN": "amber",
+      "STEVE.M JUICE RUN": "amber",
+      "ZAW CHILLER RUN": "amber",
+      "JAMES DRY RUN": "amber",
+      "BEN FREEZER RUN": "amber",
+      "JAMES AFTERNOON RUN": "amber",
+      "BEN PANTRY RUN": "amber",
+      "MEDI HOTEL - CHILLER": "blue",
+      "MEDI HOTEL - DRY": "emerald"
+    };
+
+    function CategoryLabel({ name, isSelected }) {
+      // Explicit static class strings (rather than building
+      // `bg-${color}-400` at runtime) so styling is correct no matter
+      // how the Tailwind engine scans the page.
+      const styles = {
+        amberSelected: "bg-amber-400 text-slate-900 px-1 rounded font-extrabold",
+        amber: "bg-amber-300 text-slate-900 px-1 rounded font-bold",
+        blueSelected: "bg-blue-400 text-slate-900 px-1 rounded font-extrabold",
+        blue: "bg-blue-300 text-slate-900 px-1 rounded font-bold",
+        emeraldSelected: "bg-emerald-400 text-slate-900 px-1 rounded font-extrabold",
+        emerald: "bg-emerald-300 text-slate-900 px-1 rounded font-bold",
+      };
+      const amber = isSelected ? styles.amberSelected : styles.amber;
+      const blue = isSelected ? styles.blueSelected : styles.blue;
+      const emerald = isSelected ? styles.emeraldSelected : styles.emerald;
+
+      const labelMap = {
+        "ED - DAVE": <>ED - <span className={amber}>DAVE</span></>,
+        "ZAW REHAB COLD RUN": <>ZAW <span className={amber}>REHAB COLD RUN</span></>,
+        "STEVE.M REHAB DRY RUN": <>STEVE.M <span className={amber}>REHAB DRY RUN</span></>,
+        "STEVE.M JUICE RUN": <>STEVE.M <span className={amber}>JUICE RUN</span></>,
+        "ZAW CHILLER RUN": <>ZAW <span className={amber}>CHILLER RUN</span></>,
+        "JAMES DRY RUN": <>JAMES <span className={amber}>DRY RUN</span></>,
+        "BEN FREEZER RUN": <>BEN <span className={amber}>FREEZER RUN</span></>,
+        "JAMES AFTERNOON RUN": <>JAMES <span className={amber}>AFTERNOON RUN</span></>,
+        "BEN PANTRY RUN": <>BEN <span className={amber}>PANTRY RUN</span></>,
+        "MEDI HOTEL - CHILLER": <><span className={amber}>MEDI HOTEL</span> - <span className={blue}>CHILLER</span></>,
+        "MEDI HOTEL - DRY": <><span className={amber}>MEDI HOTEL</span> - <span className={emerald}>DRY</span></>
+      };
+
+      return <span>{labelMap[name] || name}</span>;
+    }
+
+    function ProgressBar({ done, total, colorClass = "bg-emerald-500" }) {
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      return (
+        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full ${colorClass} transition-all duration-300 ease-out`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      );
+    }
+
+    // A checkbox that can show a visual "partially picked" (indeterminate)
+    // dash state — a plain React `checked` prop can't express that, so it
+    // needs a ref to set the DOM property directly.
+    function TriStateCheckbox({ checked, indeterminate, onChange, label }) {
+      const ref = React.useRef(null);
+      useEffect(() => {
+        if (ref.current) ref.current.indeterminate = indeterminate;
+      }, [indeterminate]);
+      return (
+        <input
+          ref={ref}
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          aria-label={label}
+          className="w-[18px] h-[18px] accent-emerald-600 rounded cursor-pointer flex-shrink-0"
+        />
+      );
+    }
+
+    // ============================================================
+    // MAIN APP
+    // ============================================================
+    function App() {
+      const [rules, setRules] = useState(() => {
+        try {
+          const saved = localStorage.getItem('zstores_rules_v28');
+          return saved ? JSON.parse(saved) : DEFAULT_RULES;
+        } catch (e) {
+          return DEFAULT_RULES;
+        }
+      });
+
+      const [parsedData, setParsedData] = useState([]);
+      const [unmatchedLines, setUnmatchedLines] = useState([]);
+      const [deliveryDate, setDeliveryDate] = useState("");
+      const [fileName, setFileName] = useState("");
+      const [selectedRun, setSelectedRun] = useState("ED - DAVE");
+      const [checkedItems, setCheckedItems] = useState({});
+      // Ticking an item in the pick-list summary is a separate, standalone
+      // "picked this from the store shelf" mark — it's tracked here, keyed
+      // by run+item, and deliberately never touches the per-ward line
+      // checkboxes in `checkedItems` (and vice versa).
+      const [summaryPicked, setSummaryPicked] = useState({});
+      const [highlightedItemKey, setHighlightedItemKey] = useState(null);
+      const [activeTab, setActiveTab] = useState("picker");
+      const [newCategoryItem, setNewCategoryItem] = useState("");
+      const [targetCategory, setTargetCategory] = useState(EDITABLE_CATEGORIES[0]);
+      const [isLoading, setIsLoading] = useState(false);
+      const [parseError, setParseError] = useState("");
+      const [showReview, setShowReview] = useState(false);
+
+      useEffect(() => {
+        try {
+          localStorage.setItem('zstores_rules_v28', JSON.stringify(rules));
+        } catch (e) {
+          // Storage can fail (private browsing, quota). Non-fatal —
+          // the app still works for this session.
+        }
+      }, [rules]);
+
+      useEffect(() => {
+        setHighlightedItemKey(null);
+      }, [selectedRun]);
+
+      // ---------- Routing logic (unchanged from the original rules) ----------
+      const getItemType = useCallback((itemName) => {
+        const lower = itemName.toLowerCase();
+        if (lower.includes("ice cream") || lower.includes("ice-cream") || lower.includes("bulla")) {
+          return "FREEZER";
+        }
+        if (
+          lower.includes("soy milk") || lower.includes("lactose free") || lower.includes("rice milk") ||
+          lower.includes("vitasoy") || lower.includes("so good") || lower.includes("little things") ||
+          lower.includes("sugar") || lower.includes("tea") || lower.includes("coffee") ||
+          lower.includes("cracker") || lower.includes("biscuit")
+        ) {
+          return "DRY";
+        }
+        const chillerKeywords = [
+          ...(rules["ZAW CHILLER RUN"] || []), "brownes", "milk", "yoghurt", "yogurt", "custard",
+          "pudding", "juice", "butter", "margarine", "cheese", "sandwich", "ice coffee", "iced coffee", "chill"
+        ];
+        return chillerKeywords.some(kw => lower.includes(kw.toLowerCase())) ? "CHILLER" : "DRY";
+      }, [rules]);
+
+      const getCategory = useCallback((itemName, wardName) => {
+        const lowerItem = itemName.toLowerCase();
+        const cleanWard = wardName.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        if (cleanWard.includes("emergency") || cleanWard.includes("ed")) return "ED - DAVE";
+
+        if (MEDI_HOTEL_WARDS.some(mw => cleanWard.includes(mw))) {
+          return getItemType(itemName) === "CHILLER" ? "MEDI HOTEL - CHILLER" : "MEDI HOTEL - DRY";
+        }
+
+        if (REHAB_WARDS.some(rw => cleanWard.includes(rw))) {
+          if (REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw))) return "BEN FREEZER RUN";
+          const zawKeywords = rules["ZAW REHAB COLD RUN"] || DEFAULT_RULES["ZAW REHAB COLD RUN"];
+          return zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase())) ? "ZAW REHAB COLD RUN" : "STEVE.M REHAB DRY RUN";
+        }
+
+        if (lowerItem.includes("ice coffee - brownes pc 300 ml") || lowerItem.includes("ice coffee") || lowerItem.includes("iced coffee")) {
+          if (ICE_COFFEE_BEN_PANTRY_WARDS.some(w => cleanWard.includes(w))) return "BEN PANTRY RUN";
+        }
+
+        if (BREAD_KEYWORDS.some(kw => lowerItem.includes(kw))) return null;
+        if (lowerItem.includes("sandwich") || lowerItem.includes("ham & salad") || lowerItem.includes("egg mayo")) return "ZAW CHILLER RUN";
+        if (AFTERNOON_KEYWORDS.some(kw => lowerItem.includes(kw))) return "JAMES AFTERNOON RUN";
+        if (lowerItem.includes("thick") || lowerItem.includes("level")) return "BEN PANTRY RUN";
+
+        for (const [category, keywords] of Object.entries(rules)) {
+          if (["ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"].includes(category)) continue;
+          if (keywords.some(kw => lowerItem.includes(kw.toLowerCase()))) return category;
+        }
+
+        return "BEN PANTRY RUN";
+      }, [rules, getItemType]);
+
+      // ---------- PDF parsing (hardened) ----------
+      const parseDeliveryNoteLines = useCallback((lines) => {
+        const orders = [];
+        const unmatched = [];
+        let currentWard = "Unknown Ward";
+        let extractedDate = "";
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          const lowerLine = line.toLowerCase();
+
+          // "For Date" is the authoritative field on the delivery note —
+          // prefer it over any other date-shaped text in the document
+          // (page-print timestamps, reference numbers, etc). The colon
+          // isn't required, and if the label and the date value got
+          // split across two lines by PDF text extraction, check the
+          // next line too.
+          if (!extractedDate && lowerLine.includes("for date")) {
+            const dateMatch = line.match(DATE_REGEX);
+            if (dateMatch) {
+              extractedDate = formatDateDDMMYY(dateMatch[0]);
+            } else if (i + 1 < lines.length) {
+              const nextMatch = lines[i + 1].match(DATE_REGEX);
+              if (nextMatch) extractedDate = formatDateDDMMYY(nextMatch[0]);
+            }
+          } else if (!extractedDate && lowerLine.includes("delivery note")) {
+            const dateMatch = line.match(DATE_REGEX);
+            if (dateMatch) extractedDate = formatDateDDMMYY(dateMatch[0]);
+          }
+
+          if (line.includes("FSH-") || line.toLowerCase().includes("rehab") || line.toLowerCase().includes("mental health") || line.toLowerCase().includes("emergency")) {
+            if (!extractedDate) {
+              const dateMatch = line.match(DATE_REGEX);
+              if (dateMatch) extractedDate = formatDateDDMMYY(dateMatch[0]);
+            }
+
+            const match = line.match(/(FSH-[A-Za-z0-9\s\/]+?|Mental Health[A-Za-z0-9\s]*|Rehab\s+[A-Za-z0-9]+|Emergency)(?=\s+Ad|\s+\/|$)/i);
+            currentWard = match ? match[1].trim() : line.trim();
+            continue;
+          }
+
+          // A row starts with a bare index number, followed by qty / unit / item name.
+          if (line.match(/^\d+$/) && i + 3 < lines.length) {
+            const possibleQty = lines[i + 1];
+            const possibleUnit = lines[i + 2];
+            const possibleName = lines[i + 3];
+
+            const qtyMatch = possibleQty.match(/^\d+(\.\d+)?$/);
+            const nameLooksValid = possibleName && possibleName.length > 0 && !possibleName.match(/^\d+(\.\d+)?$/);
+            const unitLooksValid = possibleUnit && possibleUnit.length > 0 && possibleUnit.length <= 20 && !possibleUnit.match(/^\d+(\.\d+)?$/);
+
+            if (qtyMatch && nameLooksValid && unitLooksValid) {
+              const canonicalUnit = UNIT_ALIASES[possibleUnit.trim().toLowerCase()];
+              const resolvedUnit = canonicalUnit || possibleUnit.trim();
+              const assignedCategory = getCategory(possibleName, currentWard);
+
+              // Some item names carry their own unit hint in a trailing
+              // parenthetical, e.g. "... (Each)" or "... (2 Litre)". If
+              // that hint disagrees with the unit the PDF actually put
+              // on this row (e.g. name says "Each" but the row says
+              // "Litre"), that's worth a second look — flag it the same
+              // way as an unrecognized unit, rather than trusting
+              // whichever one happened to be extracted.
+              let unitConflictsWithName = false;
+              const nameHint = possibleName.match(/\(([^()]*)\)\s*$/);
+              if (nameHint) {
+                const hintLower = nameHint[1].toLowerCase();
+                const hintAliasKey = Object.keys(UNIT_ALIASES).find(alias => {
+                  const re = new RegExp(`\\b${alias}\\b`);
+                  return re.test(hintLower);
+                });
+                if (hintAliasKey && UNIT_ALIASES[hintAliasKey] !== resolvedUnit) {
+                  unitConflictsWithName = true;
+                }
+              }
+
+              if (assignedCategory !== null) {
+                orders.push({
+                  id: `${currentWard}-${possibleName}-${i}-${Math.random().toString(36).slice(2)}`,
+                  ward: currentWard,
+                  qty: parseFloat(possibleQty),
+                  unit: resolvedUnit,
+                  unitVerified: Boolean(canonicalUnit) && !unitConflictsWithName,
+                  name: possibleName,
+                  category: assignedCategory
+                });
+              }
+              i += 3;
+              continue;
+            }
+
+            // Structurally looked like the start of a row (bare index number)
+            // but didn't fully check out — flag it instead of silently
+            // dropping it, so nothing goes missing without a trace.
+            if (!qtyMatch) {
+              unmatched.push({ ward: currentWard, snippet: [line, possibleQty].filter(Boolean).join(' / ') });
+            }
+          }
+        }
+
+        return { orders, unmatched, extractedDate };
+      }, [getCategory]);
+
+      const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setIsLoading(true);
+        setParseError("");
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullTextLines = [];
+          let pagesFailed = 0;
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            try {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              const pageLines = textContent.items
+                .map(item => normalizeLine(item.str || ''))
+                .filter(Boolean);
+              fullTextLines = [...fullTextLines, ...pageLines];
+            } catch (pageErr) {
+              pagesFailed += 1;
+            }
+          }
+
+          if (fullTextLines.length === 0) {
+            throw new Error("No readable text found in this PDF. It may be a scanned image rather than a text-based delivery note.");
+          }
+
+          const { orders, unmatched, extractedDate } = parseDeliveryNoteLines(fullTextLines);
+
+          if (orders.length === 0) {
+            setParseError("The PDF loaded, but no order lines were recognized. The delivery note format may have changed — check the Review panel and the original PDF.");
+          } else if (pagesFailed > 0) {
+            setParseError(`Loaded with ${pagesFailed} page(s) that couldn't be read — some items may be missing.`);
+          }
+
+          setParsedData(orders);
+          setUnmatchedLines(unmatched);
+          setDeliveryDate(extractedDate);
+          setFileName(file.name);
+          setCheckedItems({});
+          setSummaryPicked({});
+          setHighlightedItemKey(null);
+          setShowReview(false);
+        } catch (err) {
+          setParseError("Couldn't read this PDF: " + err.message);
+          setParsedData([]);
+          setUnmatchedLines([]);
+        } finally {
+          setIsLoading(false);
+          event.target.value = "";
+        }
+      };
+
+      const toggleCheck = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+      const toggleSummaryHighlight = (itemKey) => setHighlightedItemKey(prev => (prev === itemKey ? null : itemKey));
+
+      const currentRunItems = useMemo(() => parsedData.filter(item => item.category === selectedRun), [parsedData, selectedRun]);
+
+      // Ticking a pick-list summary line only flips that line's own mark —
+      // it never touches the ward rows below (see `summaryPicked` above).
+      const toggleSummaryPick = (itemLabel) => {
+        const key = `${selectedRun}|${itemLabel}`;
+        setSummaryPicked(prev => ({ ...prev, [key]: !prev[key] }));
+      };
+
+      const runCheckedCount = useMemo(
+        () => currentRunItems.filter(item => checkedItems[item.id]).length,
+        [currentRunItems, checkedItems]
+      );
+
+      const resetRunChecks = () => {
+        setCheckedItems(prev => {
+          const next = { ...prev };
+          currentRunItems.forEach(item => { delete next[item.id]; });
+          return next;
+        });
+        setSummaryPicked(prev => {
+          const next = { ...prev };
+          Object.keys(itemSummary).forEach(label => { delete next[`${selectedRun}|${label}`]; });
+          return next;
+        });
+      };
+
+      const itemSummary = useMemo(() => {
+        const totals = {};
+        currentRunItems.forEach(item => {
+          const key = getItemDisplayKey(item);
+          totals[key] = (totals[key] || 0) + item.qty;
+        });
+        return totals;
+      }, [currentRunItems]);
+
+      // How many lines exist per item-key, and how many of those are
+      // checked — used so a highlighted item stays highlighted across
+      // wards until every one of its lines is picked, instead of
+      // losing its highlight the moment a single line is checked.
+      const itemPickStatus = useMemo(() => {
+        const status = {};
+        currentRunItems.forEach(item => {
+          const key = getItemDisplayKey(item);
+          if (!status[key]) status[key] = { total: 0, checkedCount: 0 };
+          status[key].total += 1;
+          if (checkedItems[item.id]) status[key].checkedCount += 1;
+        });
+        return status;
+      }, [currentRunItems, checkedItems]);
+
+      // Auto-clear the highlight once every line for that item has
+      // been picked — the whole point of highlighting was to track
+      // it down, so once it's 100% picked it doesn't need to stay lit.
+      useEffect(() => {
+        if (!highlightedItemKey) return;
+        const status = itemPickStatus[highlightedItemKey];
+        if (status && status.total > 0 && status.checkedCount === status.total) {
+          setHighlightedItemKey(null);
+        }
+      }, [itemPickStatus, highlightedItemKey]);
+
+      const sortWardsByOrder = (grouped, orderArray) => {
+        const sortedGrouped = {};
+        orderArray.forEach(targetWard => {
+          const foundKey = Object.keys(grouped).find(
+            w => w.toLowerCase().replace(/[^a-z0-9]/g, '') === targetWard.toLowerCase().replace(/[^a-z0-9]/g, '')
+          );
+          if (foundKey && !sortedGrouped[foundKey]) sortedGrouped[foundKey] = grouped[foundKey];
+        });
+        Object.keys(grouped).forEach(wardKey => {
+          if (!sortedGrouped[wardKey]) sortedGrouped[wardKey] = grouped[wardKey];
+        });
+        return sortedGrouped;
+      };
+
+      const itemsByWard = useMemo(() => {
+        const grouped = {};
+        currentRunItems.forEach(item => {
+          if (!grouped[item.ward]) grouped[item.ward] = [];
+          grouped[item.ward].push(item);
+        });
+
+        if (selectedRun === "ED - DAVE") {
+          const typePriority = { "FREEZER": 0, "CHILLER": 1, "DRY": 2 };
+          Object.keys(grouped).forEach(wardKey => {
+            grouped[wardKey].sort((a, b) => typePriority[getItemType(a.name)] - typePriority[getItemType(b.name)]);
+          });
+        }
+
+        const runOrders = {
+          "ZAW CHILLER RUN": CHILLER_WARD_ORDER,
+          "STEVE.M JUICE RUN": JUICE_WARD_ORDER,
+          "ZAW REHAB COLD RUN": ZAW_REHAB_WARD_ORDER,
+          "STEVE.M REHAB DRY RUN": STEVE_REHAB_WARD_ORDER
+        };
+
+        if (runOrders[selectedRun]) return sortWardsByOrder(grouped, runOrders[selectedRun]);
+        if (["JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN", "BEN PANTRY RUN"].includes(selectedRun)) {
+          return sortWardsByOrder(grouped, STANDARD_RUN_WARD_ORDER);
+        }
+
+        return grouped;
+      }, [currentRunItems, selectedRun, getItemType]);
+
+      const handleAddItemRule = (e) => {
+        e.preventDefault();
+        if (!newCategoryItem.trim()) return;
+
+        setRules(prev => ({
+          ...prev,
+          [targetCategory]: [...(prev[targetCategory] || []), newCategoryItem.trim()]
+        }));
+        setNewCategoryItem("");
+      };
+
+      const handleRemoveRule = (category, keyword) => {
+        setRules(prev => ({
+          ...prev,
+          [category]: prev[category].filter(k => k !== keyword)
+        }));
+      };
+
+      return (
+        <div className="zs-page max-w-6xl mx-auto p-4 md:p-6 pb-24 md:pb-6" style={{width: "100%", boxSizing: "border-box", minWidth: 0}}>
+
+          {/* Print-only header, shown only on the physical page */}
+          <div className="print-header items-center justify-between border-b-2 border-black pb-2 mb-4">
+            <div className="font-display font-extrabold text-lg">Zstores — <CategoryLabel name={selectedRun} isSelected={false} /></div>
+            <div className="text-sm">{deliveryDate ? `Delivery date: ${deliveryDate}` : ''}</div>
+          </div>
+
+          {/* HEADER */}
+          <header className="no-print bg-ink text-white p-4 rounded-2xl shadow-lg mb-6 relative overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 via-fuchsia-500 to-amber-400" />
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-3">
+                <GeminiZLogo />
+                <div>
+                  <h1 className="font-display text-2xl font-extrabold tracking-tight text-white">
+                    Zstores
+                  </h1>
+                  <p className="text-slate-400 text-xs">Hospital store category run dispatch</p>
+                </div>
+              </div>
+
+              <nav className="flex items-center gap-2" role="tablist" aria-label="Sections">
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'picker'}
+                  onClick={() => setActiveTab("picker")}
+                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${activeTab === 'picker' ? 'bg-emerald-500 text-slate-950' : 'bg-white/10 text-slate-200 hover:bg-white/20'}`}
+                >
+                  Run picker
+                </button>
+                <button
+                  role="tab"
+                  aria-selected={activeTab === 'settings'}
+                  onClick={() => setActiveTab("settings")}
+                  className={`px-4 py-2 text-sm font-semibold rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${activeTab === 'settings' ? 'bg-emerald-500 text-slate-950' : 'bg-white/10 text-slate-200 hover:bg-white/20'}`}
+                >
+                  Item rules
+                </button>
+              </nav>
+            </div>
+          </header>
+
+          {activeTab === "picker" ? (
+            <div>
+              {/* UPLOAD & PRINT CONTROLS */}
+              <div className="no-print bg-white p-4 rounded-xl shadow-sm mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="w-full md:w-auto">
+                  <label htmlFor="pdf-upload" className="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                    Upload today's delivery note (PDF)
+                  </label>
+                  <input
+                    id="pdf-upload"
+                    type="file"
+                    accept="application/pdf"
+                    onChange={handleFileUpload}
+                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded"
+                  />
+                  {fileName && <p className="text-[11px] text-slate-400 mt-1 truncate max-w-xs">{fileName}</p>}
+                </div>
+
+                {parsedData.length > 0 && (
+                  <div className="w-full md:w-auto flex gap-2">
+                    {unmatchedLines.length > 0 && (
+                      <button
+                        onClick={() => setShowReview(v => !v)}
+                        className="px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-900 text-sm font-medium rounded-lg border border-amber-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+                      >
+                        {unmatchedLines.length} to review
+                      </button>
+                    )}
+                    <button
+                      onClick={() => window.print()}
+                      className="flex-1 md:flex-none px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                    >
+                      Print this run
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {parseError && (
+                <div className="no-print bg-amber-50 border border-amber-300 text-amber-900 text-sm px-4 py-3 rounded-xl mb-4 flex items-start justify-between gap-3">
+                  <span>{parseError}</span>
+                  <button onClick={() => setParseError("")} aria-label="Dismiss" className="font-bold text-amber-700 hover:text-amber-900">×</button>
+                </div>
+              )}
+
+              {showReview && unmatchedLines.length > 0 && (
+                <div className="no-print bg-white border border-amber-300 rounded-xl p-4 mb-4">
+                  <h3 className="text-sm font-bold text-amber-900 mb-2">Lines that need a manual look</h3>
+                  <p className="text-xs text-slate-500 mb-3">
+                    These looked like the start of an order row but didn't fully match the expected pattern, so they weren't auto-sorted. Check them against the original PDF.
+                  </p>
+                  <ul className="space-y-1 max-h-56 overflow-y-auto">
+                    {unmatchedLines.map((u, idx) => (
+                      <li key={idx} className="text-xs bg-amber-50 border border-amber-200 rounded px-2 py-1.5 flex justify-between gap-2">
+                        <span className="font-medium text-slate-700">{u.ward}</span>
+                        <span className="text-slate-500 truncate">{u.snippet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {isLoading && (
+                <div className="bg-white p-8 rounded-xl shadow-sm text-center font-medium text-slate-600 zs-enter">
+                  Reading delivery note…
+                </div>
+              )}
+
+              {/* RUN CATEGORY SELECTOR */}
+              {parsedData.length > 0 && (
+                <div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 mb-6" style={{width: "100%", minWidth: 0}}>
+                  {AVAILABLE_CATEGORIES.map(category => {
+                    const items = parsedData.filter(i => i.category === category);
+                    const count = items.length;
+                    const doneCount = items.filter(i => checkedItems[i.id]).length;
+                    const isSelected = selectedRun === category;
+                    return (
+                      <button
+                        key={category}
+                        onClick={() => setSelectedRun(category)}
+                        aria-pressed={isSelected}
+                        style={{ width: '100%', boxSizing: 'border-box' }}
+                        className={`p-3 rounded-xl border text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                          isSelected
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
+                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="text-xs font-bold tracking-wide opacity-90">
+                          <CategoryLabel name={category} isSelected={isSelected} />
+                        </div>
+                        <div className="text-xl font-bold mt-1 tabular-nums">
+                          {count} <span className="text-xs font-normal">items</span>
+                        </div>
+                        {count > 0 && (
+                          <div className="mt-2">
+                            <ProgressBar done={doneCount} total={count} colorClass={isSelected ? "bg-white" : "bg-emerald-500"} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* DELIVERY RUN DETAILS */}
+              {parsedData.length > 0 ? (
+                <div className="zs-delivery-details" style={{width: "100%", minWidth: 0}}>
+                  <div className="mb-4 flex flex-wrap justify-between items-end border-b pb-3 gap-2">
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-800">
+                        <CategoryLabel name={selectedRun} isSelected={false} /> delivery list
+                      </h2>
+                      <p className="text-xs text-slate-500">
+                        {selectedRun === "ED - DAVE"
+                          ? "Sorted: freezer (top) → chiller (middle) → dry (bottom)"
+                          : "Sorted in fixed route print sequence"}
+                        {WARD_ONLY_CATEGORIES[selectedRun] ? ` · ${WARD_ONLY_CATEGORIES[selectedRun]}` : ''}
+                      </p>
+                    </div>
+                    <div className="no-print flex items-center gap-2 flex-wrap">
+                      {deliveryDate && (
+                        <span className="text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-200 px-3 py-1 rounded-full">
+                          Date: {deliveryDate}
+                        </span>
+                      )}
+                      <span className="text-xs font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full tabular-nums">
+                        {runCheckedCount}/{currentRunItems.length} picked
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* PICK LIST SUMMARY */}
+                  {Object.keys(itemSummary).length > 0 && (
+                    <div className="card zs-summary-card bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6" style={{width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box"}}>
+                      <div className="flex justify-between items-center mb-2 border-b border-emerald-200 pb-1 flex-wrap gap-1">
+                        <h3 className="text-sm font-bold text-emerald-900 tracking-wide">
+                          Catering store pick list summary
+                        </h3>
+                        <span className="text-[11px] text-emerald-700 font-medium">
+                          Tick to mark picked from the store · tap the row to highlight it below
+                        </span>
+                      </div>
+                      <div className="zs-summary-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" style={{width: "100%", minWidth: 0}}>
+                        {Object.entries(itemSummary).map(([itemLabel, totalQty]) => {
+                          const isSelected = highlightedItemKey === itemLabel;
+                          const wardStatus = itemPickStatus[itemLabel];
+                          const wardPartiallyDone = Boolean(wardStatus) && wardStatus.checkedCount > 0 && wardStatus.checkedCount < wardStatus.total;
+                          const isTicked = Boolean(summaryPicked[`${selectedRun}|${itemLabel}`]);
+                          return (
+                            <div
+                              key={itemLabel}
+                              style={{
+                                width: '100%', boxSizing: 'border-box', display: 'grid',
+                                gridTemplateColumns: 'auto minmax(0, 1fr)', alignItems: 'stretch'
+                              }}
+                              className={`print-row rounded border overflow-hidden transition ${
+                                isTicked
+                                  ? 'bg-slate-50 border-slate-200 opacity-70'
+                                  : isSelected
+                                  ? 'bg-amber-300 border-amber-500 ring-2 ring-amber-400 shadow-sm'
+                                  : 'bg-white border-emerald-200'
+                              }`}
+                            >
+                              <label
+                                className="flex items-center pl-2 pr-1.5 cursor-pointer"
+                                title="Mark this item as picked from the store (doesn't affect ward rows below)"
+                              >
+                                <TriStateCheckbox
+                                  checked={isTicked}
+                                  indeterminate={false}
+                                  onChange={() => toggleSummaryPick(itemLabel)}
+                                  label={`Mark ${itemLabel} as picked from the store`}
+                                />
+                              </label>
+                              <button
+                                onClick={() => toggleSummaryHighlight(itemLabel)}
+                                aria-pressed={isSelected}
+                                style={{
+                                  width: '100%', boxSizing: 'border-box', display: 'grid',
+                                  gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center'
+                                }}
+                                className={`py-2 pr-3 pl-1 text-sm font-semibold transition text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                                  isTicked
+                                    ? 'text-slate-500'
+                                    : isSelected
+                                    ? 'text-slate-900 font-bold'
+                                    : 'text-slate-800 hover:bg-emerald-100'
+                                }`}
+                              >
+                                <span style={{ minWidth: 0 }}>
+                                  <span className={`block truncate ${isTicked ? 'line-through' : ''}`}>{itemLabel}</span>
+                                  {isSelected && wardStatus && wardStatus.total > 1 && wardStatus.checkedCount < wardStatus.total && (
+                                    <span className="block text-[10px] font-medium text-amber-800 tabular-nums">
+                                      {wardStatus.checkedCount}/{wardStatus.total} ward lines picked — stays lit till 100%
+                                    </span>
+                                  )}
+                                  {wardPartiallyDone && !isSelected && (
+                                    <span className="block text-[10px] font-medium text-slate-500 tabular-nums">
+                                      {wardStatus.checkedCount}/{wardStatus.total} ward lines picked
+                                    </span>
+                                  )}
+                                </span>
+                                <span className={`px-2 py-0.5 rounded font-bold ml-2 tabular-nums ${isTicked ? 'bg-slate-300 text-slate-700' : isSelected ? 'bg-slate-900 text-white' : 'bg-emerald-600 text-white'}`}>
+                                  {totalQty}
+                                </span>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ITEM LIST BY WARD */}
+                  {Object.keys(itemsByWard).length > 0 && (
+                    <div className="no-print flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-bold text-slate-600 tracking-wide">Ward delivery lists</h3>
+                      {runCheckedCount > 0 && (
+                        <button
+                          onClick={resetRunChecks}
+                          className="text-xs font-medium text-slate-500 hover:text-slate-800 underline underline-offset-2"
+                        >
+                          Reset checks
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {Object.keys(itemsByWard).length === 0 ? (
+                    <div className="bg-white p-8 rounded-xl shadow-sm text-center text-slate-500">
+                      No items assigned to <CategoryLabel name={selectedRun} isSelected={false} /> from today's delivery note.
+                    </div>
+                  ) : (
+                    <div className="zs-ward-list grid gap-4" style={{width: "100%", minWidth: 0}}>
+                      {Object.entries(itemsByWard).map(([ward, items]) => {
+                        const wardDone = items.filter(i => checkedItems[i.id]).length;
+                        return (
+                        <div key={ward} className="zs-ward-card card bg-white rounded-xl shadow-sm p-4 border border-slate-200" style={{width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box"}}>
+                          <div className="print-keep-with-next border-b pb-2 mb-3">
+                            <div className="flex justify-between items-center">
+                              <span className="text-lg font-bold text-slate-900">{ward}</span>
+                              <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full tabular-nums no-print">
+                                {wardDone}/{items.length}
+                              </span>
+                            </div>
+                            <div className="no-print mt-2">
+                              <ProgressBar done={wardDone} total={items.length} />
+                            </div>
+                          </div>
+
+                          <div className="divide-y divide-slate-100">
+                            {items.map(item => {
+                              const isChecked = !!checkedItems[item.id];
+                              const itemType = getItemType(item.name);
+                              const itemKey = getItemDisplayKey(item);
+                              const isHighlighted = highlightedItemKey === itemKey;
+
+                              const badgeStyles = {
+                                "FREEZER": "bg-cyan-100 text-cyan-900 border border-cyan-200",
+                                "CHILLER": "bg-blue-100 text-blue-900 border border-blue-200",
+                                "DRY": "bg-amber-100 text-amber-900 border border-amber-200"
+                              };
+
+                              // A highlighted item keeps its highlight look even after this
+                              // particular line is checked — it only fully clears once every
+                              // line sharing this item key is picked (see itemPickStatus effect
+                              // above). This row still gets a lighter/struck-through treatment
+                              // so it's clear *this* line is done, without losing track of the
+                              // rest of the highlighted group.
+                              let rowClass = 'hover:bg-slate-50';
+                              if (isHighlighted) {
+                                rowClass = isChecked
+                                  ? 'bg-amber-50 text-amber-800 border-l-4 border-amber-300'
+                                  : 'bg-amber-100 text-amber-950 font-bold border-l-4 border-amber-500 shadow-sm';
+                              } else if (isChecked) {
+                                rowClass = 'bg-slate-50 opacity-60';
+                              }
+
+                              let nameClass = 'text-slate-800 font-medium';
+                              if (isHighlighted) {
+                                nameClass = isChecked
+                                  ? 'line-through text-amber-700 font-medium'
+                                  : 'text-amber-950 font-bold text-base';
+                              } else if (isChecked) {
+                                nameClass = 'line-through text-slate-400 font-normal';
+                              }
+
+                              return (
+                                <label
+                                  key={item.id}
+                                  className={`print-row py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${rowClass}`}
+                                >
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <span className="print-checkbox" aria-hidden="true"></span>
+                                    <input
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => toggleCheck(item.id)}
+                                      className="w-5 h-5 accent-emerald-600 rounded cursor-pointer no-print flex-shrink-0"
+                                    />
+                                    <span className={`text-sm truncate min-w-0 ${nameClass}`}>
+                                      {item.name}
+                                    </span>
+                                    {!item.unitVerified && (
+                                      <span className="no-print text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300 flex-shrink-0" title="Unit wasn't a recognized label, or disagrees with the unit named in the item itself — double check it.">
+                                        verify unit
+                                      </span>
+                                    )}
+                                    {selectedRun === "ED - DAVE" && (
+                                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex-shrink-0 ${badgeStyles[itemType]}`}>
+                                        {itemType}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <div className={`text-sm font-bold px-3 py-1 rounded-md tabular-nums flex-shrink-0 ${isHighlighted ? (isChecked ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-amber-300 text-slate-900 border border-amber-400') : 'bg-slate-100 text-slate-900'}`}>
+                                    {item.qty} <span className="text-xs font-normal text-slate-600">{item.unit}</span>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );})}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                !isLoading && (
+                  <div className="bg-white p-12 rounded-xl shadow-sm text-center zs-enter">
+                    <div className="flex justify-center mb-3"><GeminiZLogo className="w-12 h-12 opacity-80" /></div>
+                    <h3 className="text-lg font-bold text-slate-800">No delivery note loaded yet</h3>
+                    <p className="text-sm text-slate-500 max-w-md mx-auto mt-1">
+                      Upload today's PDF delivery note above to split it into the store's category runs.
+                    </p>
+                  </div>
+                )
+              )}
+            </div>
+          ) : (
+            /* RULES SETTINGS TAB */
+            <div className="no-print bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-slate-800 mb-2">Category rule settings</h2>
+              <p className="text-xs text-slate-500 mb-6">
+                Manage keywords used to automatically route incoming PDF items into the category runs.
+                Runs assigned purely by ward (ED - DAVE, Medi Hotel, and the rehab dry fallback) aren't listed
+                as targets below, since keywords have no effect on them.
+              </p>
+
+              <form onSubmit={handleAddItemRule} className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8 flex flex-col md:flex-row gap-3 items-end">
+                <div className="flex-1 w-full">
+                  <label htmlFor="new-keyword" className="block text-xs font-semibold text-slate-600 mb-1">Item name / keyword</label>
+                  <input
+                    id="new-keyword"
+                    type="text"
+                    value={newCategoryItem}
+                    onChange={(e) => setNewCategoryItem(e.target.value)}
+                    placeholder="e.g., Strawberry Yoghurt"
+                    className="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                  />
+                </div>
+
+                <div className="w-full md:w-56">
+                  <label htmlFor="target-category" className="block text-xs font-semibold text-slate-600 mb-1">Assign to category run</label>
+                  <select
+                    id="target-category"
+                    value={targetCategory}
+                    onChange={(e) => setTargetCategory(e.target.value)}
+                    className="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 bg-white"
+                  >
+                    {EDITABLE_CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full md:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                >
+                  Add item rule
+                </button>
+              </form>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {Object.entries(rules).map(([category, keywords]) => {
+                  const isWardOnly = Boolean(WARD_ONLY_CATEGORIES[category]);
+                  return (
+                  <div key={category} className={`border rounded-xl p-4 ${isWardOnly ? 'border-slate-100 bg-slate-50' : 'border-slate-200'}`}>
+                    <h3 className="font-bold text-slate-800 border-b pb-2 mb-3 flex justify-between items-center gap-2">
+                      <CategoryLabel name={category} isSelected={false} />
+                      <span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 flex-shrink-0">
+                        {isWardOnly ? 'ward-based' : `${keywords.length} keywords`}
+                      </span>
+                    </h3>
+
+                    {isWardOnly ? (
+                      <p className="text-xs text-slate-400 italic">{WARD_ONLY_CATEGORIES[category]}</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5">
+                        {keywords.length === 0 ? (
+                          <span className="text-xs text-slate-400 italic">No keywords yet — nothing routes here automatically until you add one.</span>
+                        ) : (
+                          keywords.map((kw, idx) => (
+                            <span key={idx} className="bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-md flex items-center gap-2 border border-slate-200">
+                              {kw}
+                              <button
+                                onClick={() => handleRemoveRule(category, kw)}
+                                aria-label={`Remove ${kw}`}
+                                className="text-slate-400 hover:text-red-500 font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 rounded"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );})}
+              </div>
+            </div>
+          )}
+
+          {/* MOBILE STICKY ACTION BAR */}
+          {parsedData.length > 0 && activeTab === 'picker' && (
+            <div className="no-print md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 p-3 flex items-center justify-between gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+              <div className="text-xs font-semibold text-slate-600 tabular-nums">
+                {runCheckedCount}/{currentRunItems.length} picked
+              </div>
+              <button
+                onClick={() => window.print()}
+                className="px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-lg"
+              >
+                Print run
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
