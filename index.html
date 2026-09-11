@@ -48,29 +48,27 @@
       min-width: 0;
       -webkit-text-size-adjust: 100%;
     }
-
     body {
       margin: 0;
       width: 100%;
       min-width: 0;
       overflow-x: hidden;
     }
-
-    #root {
-      width: 100%;
-      min-width: 0;
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
+    #root { width: 100%; min-width: 0; }
+    *, *::before, *::after { box-sizing: border-box; }
 
     .font-display { font-family: 'Inter Tight', 'Inter', ui-sans-serif, sans-serif; }
     .tabular-nums { font-variant-numeric: tabular-nums; }
 
-    /* iOS Safari can calculate an auto-width grid/block differently from
-       Android/desktop when a descendant contains intrinsic text widths.
-       Keep the main content and cards explicitly stretchable. */
+    /* A CSS Grid container with no explicit grid-template-columns falls
+       back to an implicit "auto"-sized track, which can grow wider than
+       its own parent to fit unshrinkable content (e.g. a ward row whose
+       checkbox + long name + badges + quantity don't wrap or truncate
+       correctly on iOS Safari). That silently drags the whole page's
+       scrollable width wider than the viewport, making everything else
+       LOOK too narrow by comparison even though it was sized correctly
+       all along. Every layout container down to the card level gets an
+       explicit, clamped width so none of them can do this. */
     .zs-page,
     .zs-delivery-details,
     .zs-summary-card,
@@ -119,7 +117,7 @@
          previous one blank. Only individual rows need protecting from
          being sliced in half by a page break. */
       .card { border: 1px solid #ccc !important; box-shadow: none !important; margin-bottom: 0.6rem; }
-      .print-row { page-break-inside: avoid; break-inside: avoid; }
+      .print-row { page-break-inside: avoid; break-inside: avoid-page; -webkit-column-break-inside: avoid; }
       .print-keep-with-next { page-break-after: avoid; break-after: avoid; }
       .print-checkbox {
         width: 14px; height: 14px; border: 1.5px solid #333; border-radius: 3px;
@@ -785,7 +783,7 @@
       };
 
       return (
-        <div className="zs-page max-w-6xl mx-auto p-4 md:p-6 pb-24 md:pb-6" style={{width: "100%", boxSizing: "border-box", minWidth: 0}}>
+        <div className="zs-page max-w-6xl mx-auto p-4 md:p-6 pb-24 md:pb-6" style={{ width: '100%', boxSizing: 'border-box', minWidth: 0 }}>
 
           {/* Print-only header, shown only on the physical page */}
           <div className="print-header items-center justify-between border-b-2 border-black pb-2 mb-4">
@@ -898,7 +896,7 @@
 
               {/* RUN CATEGORY SELECTOR */}
               {parsedData.length > 0 && (
-                <div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 mb-6" style={{width: "100%", minWidth: 0}}>
+                <div className="no-print grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
                   {AVAILABLE_CATEGORIES.map(category => {
                     const items = parsedData.filter(i => i.category === category);
                     const count = items.length;
@@ -935,7 +933,7 @@
 
               {/* DELIVERY RUN DETAILS */}
               {parsedData.length > 0 ? (
-                <div className="zs-delivery-details" style={{width: "100%", minWidth: 0}}>
+                <div className="zs-delivery-details" style={{ width: '100%', minWidth: 0 }}>
                   <div className="mb-4 flex flex-wrap justify-between items-end border-b pb-3 gap-2">
                     <div>
                       <h2 className="text-xl font-bold text-slate-800">
@@ -962,7 +960,7 @@
 
                   {/* PICK LIST SUMMARY */}
                   {Object.keys(itemSummary).length > 0 && (
-                    <div className="card zs-summary-card bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6" style={{width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box"}}>
+                    <div className="card zs-summary-card bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6" style={{ width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
                       <div className="flex justify-between items-center mb-2 border-b border-emerald-200 pb-1 flex-wrap gap-1">
                         <h3 className="text-sm font-bold text-emerald-900 tracking-wide">
                           Catering store pick list summary
@@ -971,20 +969,20 @@
                           Tick to mark picked from the store · tap the row to highlight it below
                         </span>
                       </div>
-                      <div className="zs-summary-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" style={{width: "100%", minWidth: 0}}>
+                      <div className="zs-summary-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" style={{ width: '100%', minWidth: 0 }}>
                         {Object.entries(itemSummary).map(([itemLabel, totalQty]) => {
                           const isSelected = highlightedItemKey === itemLabel;
                           const wardStatus = itemPickStatus[itemLabel];
                           const wardPartiallyDone = Boolean(wardStatus) && wardStatus.checkedCount > 0 && wardStatus.checkedCount < wardStatus.total;
                           const isTicked = Boolean(summaryPicked[`${selectedRun}|${itemLabel}`]);
                           return (
+                            <div key={itemLabel} className="print-row" style={{ width: '100%', display: 'block' }}>
                             <div
-                              key={itemLabel}
                               style={{
                                 width: '100%', boxSizing: 'border-box', display: 'grid',
                                 gridTemplateColumns: 'auto minmax(0, 1fr)', alignItems: 'stretch'
                               }}
-                              className={`print-row rounded border overflow-hidden transition ${
+                              className={`rounded border overflow-hidden transition ${
                                 isTicked
                                   ? 'bg-slate-50 border-slate-200 opacity-70'
                                   : isSelected
@@ -1036,6 +1034,7 @@
                                 </span>
                               </button>
                             </div>
+                            </div>
                           );
                         })}
                       </div>
@@ -1061,11 +1060,11 @@
                       No items assigned to <CategoryLabel name={selectedRun} isSelected={false} /> from today's delivery note.
                     </div>
                   ) : (
-                    <div className="zs-ward-list grid gap-4" style={{width: "100%", minWidth: 0}}>
+                    <div className="zs-ward-list grid grid-cols-1 gap-4" style={{ gridTemplateColumns: 'minmax(0, 1fr)', width: '100%', minWidth: 0 }}>
                       {Object.entries(itemsByWard).map(([ward, items]) => {
                         const wardDone = items.filter(i => checkedItems[i.id]).length;
                         return (
-                        <div key={ward} className="zs-ward-card card bg-white rounded-xl shadow-sm p-4 border border-slate-200" style={{width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box"}}>
+                        <div key={ward} className="card zs-ward-card bg-white rounded-xl shadow-sm p-4 border border-slate-200" style={{ width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' }}>
                           <div className="print-keep-with-next border-b pb-2 mb-3">
                             <div className="flex justify-between items-center">
                               <span className="text-lg font-bold text-slate-900">{ward}</span>
@@ -1116,9 +1115,9 @@
                               }
 
                               return (
+                                <div key={item.id} className="print-row" style={{ display: 'block' }}>
                                 <label
-                                  key={item.id}
-                                  className={`print-row py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${rowClass}`}
+                                  className={`py-2.5 px-2 flex items-center justify-between cursor-pointer rounded transition ${rowClass}`}
                                 >
                                   <div className="flex items-center gap-3 min-w-0">
                                     <span className="print-checkbox" aria-hidden="true"></span>
@@ -1147,6 +1146,7 @@
                                     {item.qty} <span className="text-xs font-normal text-slate-600">{item.unit}</span>
                                   </div>
                                 </label>
+                                </div>
                               );
                             })}
                           </div>
