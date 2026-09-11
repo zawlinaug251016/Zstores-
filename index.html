@@ -46,6 +46,19 @@
     .font-display { font-family: 'Inter Tight', 'Inter', ui-sans-serif, sans-serif; }
     .tabular-nums { font-variant-numeric: tabular-nums; }
 
+    /* iOS Safari renders <button> with its own native control chrome
+       (appearance) even after custom border/background/rounded-corner
+       classes are applied — this can make a button's visible box sit
+       slightly inset from its true CSS width, which is exactly what
+       showed up as "not edge to edge" only on iPhone (Chrome/Android
+       and desktop browsers don't apply this native styling). Stripping
+       appearance makes buttons render as plain boxes everywhere. */
+    button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+
     ::-webkit-scrollbar { height: 8px; width: 8px; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -908,14 +921,6 @@
                       <span className="text-xs font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full tabular-nums">
                         {runCheckedCount}/{currentRunItems.length} picked
                       </span>
-                      {runCheckedCount > 0 && (
-                        <button
-                          onClick={resetRunChecks}
-                          className="text-xs font-medium text-slate-500 hover:text-slate-800 underline underline-offset-2"
-                        >
-                          Reset checks
-                        </button>
-                      )}
                     </div>
                   </div>
 
@@ -996,6 +1001,19 @@
                   )}
 
                   {/* ITEM LIST BY WARD */}
+                  {Object.keys(itemsByWard).length > 0 && (
+                    <div className="no-print flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-bold text-slate-600 tracking-wide">Ward delivery lists</h3>
+                      {runCheckedCount > 0 && (
+                        <button
+                          onClick={resetRunChecks}
+                          className="text-xs font-medium text-slate-500 hover:text-slate-800 underline underline-offset-2"
+                        >
+                          Reset checks
+                        </button>
+                      )}
+                    </div>
+                  )}
                   {Object.keys(itemsByWard).length === 0 ? (
                     <div className="bg-white p-8 rounded-xl shadow-sm text-center text-slate-500">
                       No items assigned to <CategoryLabel name={selectedRun} isSelected={false} /> from today's delivery note.
