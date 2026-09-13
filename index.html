@@ -198,6 +198,7 @@
         "Fruit Cake PC", "Milo"
       ],
       "BEN FREEZER RUN": ["Ice Cream", "Butter PC", "Margarine PC"],
+      "REHAB FREEZER RUN": [],
       "JAMES AFTERNOON RUN": ["Bananas fresh", "Fresh Bananas", "Apple Fresh", "Fresh Apple", "Carrot Cake"],
       "BEN PANTRY RUN": ["Thick", "Thickened", "Level 100", "Level 400", "Level 900"],
       "MEDI HOTEL - CHILLER": [],
@@ -250,7 +251,7 @@
     ];
 
     const AVAILABLE_CATEGORIES = [
-      "ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "STEVE.M JUICE RUN",
+      "ED - DAVE", "ZAW REHAB COLD RUN", "STEVE.M REHAB DRY RUN", "REHAB FREEZER RUN", "STEVE.M JUICE RUN",
       "ZAW CHILLER RUN", "JAMES DRY RUN", "BEN FREEZER RUN", "JAMES AFTERNOON RUN",
       "BEN PANTRY RUN", "MEDI HOTEL - CHILLER", "MEDI HOTEL - DRY"
     ];
@@ -268,7 +269,8 @@
       "ED - DAVE": "Assigned automatically — every item for the Emergency Department ward goes here.",
       "MEDI HOTEL - CHILLER": "Assigned automatically by ward (M5–M8) and item temperature zone.",
       "MEDI HOTEL - DRY": "Assigned automatically by ward (M5–M8) and item temperature zone.",
-      "STEVE.M REHAB DRY RUN": "Automatic fallback for rehab-ward items that aren't on the Cold Run list."
+      "STEVE.M REHAB DRY RUN": "Automatic fallback for rehab-ward items that aren't on the Cold Run list.",
+      "REHAB FREEZER RUN": "Assigned automatically — freezer-type items (ice cream, butter, margarine, breads, etc.) for the rehab wards and Mental Health A."
     };
 
     // Known unit labels as they appear on this store's delivery notes.
@@ -324,6 +326,7 @@
       "ED - DAVE": "amber",
       "ZAW REHAB COLD RUN": "amber",
       "STEVE.M REHAB DRY RUN": "amber",
+      "REHAB FREEZER RUN": "cyan",
       "STEVE.M JUICE RUN": "amber",
       "ZAW CHILLER RUN": "amber",
       "JAMES DRY RUN": "amber",
@@ -345,15 +348,19 @@
         blue: "bg-blue-300 text-slate-900 px-1 rounded font-bold",
         emeraldSelected: "bg-emerald-400 text-slate-900 px-1 rounded font-extrabold",
         emerald: "bg-emerald-300 text-slate-900 px-1 rounded font-bold",
+        cyanSelected: "bg-cyan-400 text-slate-900 px-1 rounded font-extrabold",
+        cyan: "bg-cyan-300 text-slate-900 px-1 rounded font-bold",
       };
       const amber = isSelected ? styles.amberSelected : styles.amber;
       const blue = isSelected ? styles.blueSelected : styles.blue;
       const emerald = isSelected ? styles.emeraldSelected : styles.emerald;
+      const cyan = isSelected ? styles.cyanSelected : styles.cyan;
 
       const labelMap = {
         "ED - DAVE": <>ED - <span className={amber}>DAVE</span></>,
         "ZAW REHAB COLD RUN": <>ZAW <span className={amber}>REHAB COLD RUN</span></>,
         "STEVE.M REHAB DRY RUN": <>STEVE.M <span className={amber}>REHAB DRY RUN</span></>,
+        "REHAB FREEZER RUN": <>REHAB <span className={cyan}>FREEZER RUN</span></>,
         "STEVE.M JUICE RUN": <>STEVE.M <span className={amber}>JUICE RUN</span></>,
         "ZAW CHILLER RUN": <>ZAW <span className={amber}>CHILLER RUN</span></>,
         "JAMES DRY RUN": <>JAMES <span className={amber}>DRY RUN</span></>,
@@ -476,7 +483,7 @@
         }
 
         if (REHAB_WARDS.some(rw => cleanWard.includes(rw))) {
-          if (REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw))) return "BEN FREEZER RUN";
+          if (REHAB_FREEZER_KEYWORDS.some(kw => lowerItem.includes(kw))) return "REHAB FREEZER RUN";
           const zawKeywords = rules["ZAW REHAB COLD RUN"] || DEFAULT_RULES["ZAW REHAB COLD RUN"];
           return zawKeywords.some(kw => lowerItem.includes(kw.toLowerCase())) ? "ZAW REHAB COLD RUN" : "STEVE.M REHAB DRY RUN";
         }
@@ -753,7 +760,8 @@
           "ZAW CHILLER RUN": CHILLER_WARD_ORDER,
           "STEVE.M JUICE RUN": JUICE_WARD_ORDER,
           "ZAW REHAB COLD RUN": ZAW_REHAB_WARD_ORDER,
-          "STEVE.M REHAB DRY RUN": STEVE_REHAB_WARD_ORDER
+          "STEVE.M REHAB DRY RUN": STEVE_REHAB_WARD_ORDER,
+          "REHAB FREEZER RUN": ZAW_REHAB_WARD_ORDER
         };
 
         if (runOrders[selectedRun]) return sortWardsByOrder(grouped, runOrders[selectedRun]);
