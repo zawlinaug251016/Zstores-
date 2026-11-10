@@ -156,11 +156,11 @@ const ZS_PEOPLE=(()=>{
   const ED="ED(EMERGENCY) DAVE",STEVE="REHAB DRY RUN STEVE",JUICE="JUICE RUN McCUTCHEON",ABM="AB MILK RUN BEN",ZAW="REHAB COLD RUN ZAW",CHILL="CHILLER RUN LIN",CDM="CD MILK RUN AUNG",PANTRY="PANTRY RUN YEE",JAMES="DRY RUN JAMES",YEO="REHAB FREEZER RUN YEO",JINSON="AB/CD FREEZER RUN JINSON",GEORGE="AFTERNOON RUN GEORGE",PHUB="MEDI HOTEL RUN PHUB";
   const D=(run,suf)=>({k:"Deliver",run,open:1,suf}),R=(run,suf)=>({k:"Repack",run,suf}),T=txt=>({txt});
   return[
-    {id:"P1",time:"05:30\u201314:00",tasks:[T("Unload incoming goods"),T("Deliver \u2013 ED 7:30 PPM"),D(STEVE),R(STEVE,"trolley"),D(JUICE),R(JUICE,"trolley"),D(ABM),R(ABM)]},
-    {id:"P2",time:"05:30\u201314:00",tasks:[T("Unload incoming goods"),D(ED),D(ZAW),R(ZAW,"trolley"),D(CHILL),R(CHILL),D(CDM),R(CDM,"trolley")]},
-    {id:"P3",time:"06:00\u201314:30",tasks:[T("Deliver \u2013 PPM RUN (10 locations)"),T("Take over Snack Phone from P1 & P2 at 8am"),T("Repack \u2013 PPM RUN trolley"),T("Deliver \u2013 Secure Unit PPM"),T("Repack \u2013 Secure Unit PPM"),D(PANTRY),T("Repack \u2013 4 x ED PPM (7:30 / 12:00 / 20:30 / 02:00)"),T("Receive and unload \u2013 all incoming late deliveries (SuperStock / PFD / Sealanes / DBC / Yuans / etc.)"),T("Deliver \u2013 snack orders, time to time")]},
+    {id:"P1",time:"05:30\u201314:00",tasks:[T("Unload incoming goods"),T("Deliver \u2013 ED 7:30 PPM"),D(STEVE),R(STEVE,"trolley"),D(JUICE),R(JUICE,"trolley"),D(ABM),R(ABM),T("Clear Milk Crates and Bread Crates")]},
+    {id:"P2",time:"05:30\u201314:00",tasks:[T("Unload incoming goods"),D(ED),D(ZAW),R(ZAW,"trolley"),D(CHILL),R(CHILL),D(CDM),R(CDM,"trolley"),T("Clear Milk Crates and Bread Crates")]},
+    {id:"P3",time:"06:00\u201314:30",tasks:[T("Deliver \u2013 PPM RUN (10 locations)"),T("Take over Snack Phone from P1 & P2 at 8am"),T("Repack \u2013 PPM RUN trolley"),T("Deliver \u2013 Secure Unit PPM"),T("Repack \u2013 Secure Unit PPM"),D(PANTRY),T("Repack \u2013 4 x ED PPM (7:30 / 12:00 / 20:30 / 02:00)"),T("Receive and unload \u2013 all incoming late deliveries (SuperStock / PFD / Sealanes / DBC / Yuans / etc.)"),T("Deliver \u2013 snack orders, time to time"),T("Clear Milk Crates and Bread Crates")]},
     {id:"P4",time:"08:00\u201312:00",tasks:[D(JAMES),R(JAMES),D(YEO),D(JINSON),T("Deliver \u2013 ED 12:00")]},
-    {id:"P5",time:"12:00\u201320:30",tasks:[D(GEORGE,"trolley"),R(GEORGE,"trolley"),D(PHUB),T("Receive \u2013 incoming late deliveries (BUNZL / SYMBION / CH2 / HOST / etc.)"),T("Deliver \u2013 snack orders, time to time"),T("Deliver \u2013 ED 20:30 PPM"),{k:"Pack",run:ED,open:1,suf:"Mon\u2013Fri"}]}
+    {id:"P5",time:"12:00\u201320:30",tasks:[D(GEORGE,"trolley"),R(GEORGE,"trolley"),D(PHUB),T("Receive \u2013 incoming late deliveries (BUNZL / SYMBION / CH2 / HOST / etc.)"),T("Deliver \u2013 snack orders, time to time"),T("Refill ADHOC shelves \u2013 collect all expired sandwiches"),T("Refill Ham & Salad and Egg & Mayo sandwiches for the Plating Line"),T("Refill dishwasher chemicals"),T("Collect and clean Stores trolleys"),T("Deliver \u2013 ED 20:30 PPM"),{k:"Pack",run:ED,open:1,suf:"Mon\u2013Fri"},T("Clear Milk Crates and Bread Crates")]}
   ];
 })();
 const zsToday=()=>{try{return new Date().toLocaleDateString("en-CA")}catch{return""}};
@@ -174,7 +174,7 @@ function ZsTaskLabel({t}){
     </span>:<span className="text-sm font-medium text-slate-800">{t.txt}</span>
 }
 function ZsBar({label,onBack}){
-  return<div className="no-print mb-3"><button type="button"onClick={onBack}className="text-xs font-semibold px-3 py-1.5 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">&larr; {label}</button></div>
+  return<div className="no-print mb-3"><button type="button"onClick={onBack}className="text-sm font-extrabold uppercase tracking-wide px-4 py-2 rounded-full bg-yellow-300 hover:bg-yellow-200 text-slate-900 border-2 border-yellow-500 shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">&larr; {label}</button></div>
 }
 function ZsHome({done,onPick}){
   const wk=(()=>{try{const d=new Date().getDay();return d===0||d===6}catch{return!1}})();
@@ -195,12 +195,13 @@ function ZsHome({done,onPick}){
         <div className="text-xs font-semibold text-slate-300 mt-1">Sat &amp; Sun &middot; all runs</div>
       </button>
     </div>
+    <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-xs font-semibold px-3 py-2.5"><span aria-hidden="true">&#9888;</span><span><b>Reminder:</b> Ensuring the fridge is properly set up and ready to receive deliveries is the responsibility of every shift.</span></div>
   </div>
 }
 function ZsPerson({person,done,orders,checked,onToggle,onOpen,onBack}){
   const t=person.tasks.length,s=person.tasks.filter((_,k)=>done[person.id+"-"+k]).length;
   return<div className="no-print mb-6">
-    <ZsBar label="All staff"onBack={onBack}/>
+    <ZsBar label="ALL STAFF"onBack={onBack}/>
     <div className="bg-white rounded-xl shadow-sm p-4 mb-3">
       <div className="flex items-baseline justify-between gap-2 flex-wrap">
         <h2 className="text-xl font-extrabold text-slate-800 font-display">{person.id} <span className="text-sm font-semibold text-slate-500">({person.time})</span></h2>
@@ -306,7 +307,7 @@ function App(){const[n,o]=useState(()=>{try{const e=localStorage.getItem("zstore
 
               {}
               {zsPerson==="home"&&<ZsHome done={zsDone}onPick={e=>{setZsPerson(e);setZsRunOpen(!1)}}/>}
-              {zsPerson==="WEEKEND"&&<ZsBar label="All staff"onBack={()=>{setZsPerson("home");setZsRunOpen(!1)}}/>}
+              {zsPerson==="WEEKEND"&&<ZsBar label="ALL STAFF"onBack={()=>{setZsPerson("home");setZsRunOpen(!1)}}/>}
               {zsPerson!=="home"&&zsPerson!=="WEEKEND"&&!zsRunOpen&&<ZsPerson person={ZS_PEOPLE.find(e=>e.id===zsPerson)}done={zsDone}orders={i}checked={x}onToggle={zsToggle}onOpen={e=>{ee(e);setZsRunOpen(!0)}}onBack={()=>setZsPerson("home")}/>}
               {zsPerson!=="home"&&zsPerson!=="WEEKEND"&&zsRunOpen&&<ZsBar label={`${zsPerson} tasks`}onBack={()=>setZsRunOpen(!1)}/>}
 
